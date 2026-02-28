@@ -2,12 +2,12 @@ import React, { useCallback, useState } from 'react';
 import { View, FlatList, StyleSheet, Alert } from 'react-native';
 import {
     Text, Surface, Button, Chip, List, Divider, IconButton,
-    ActivityIndicator, useTheme, Menu, ProgressBar,
+    ActivityIndicator, useTheme, Menu,
 } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { getTodayTasks, getUpcomingTasks, updateTaskStatus } from '@/features/api';
 import { shareCarePlan } from '@/services/carePlanService';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
 import { Share2 } from 'lucide-react-native';
 
 type TodayTask = {
@@ -21,15 +21,13 @@ type TodayTask = {
     taskType: string | null;
     taskDescription: string | null;
     templateTitle: string | null;
-    startDate: Date | null;
-    totalDurationDays: number | null;
 };
 
 const TASK_TYPE_COLORS: Record<string, string> = {
-    Preparation: '#A5D6A7', // Green
-    Care: '#81D4FA', // Blue
-    Harvest: '#FFF59D', // Yellow
-    Check: '#E1BEE7', // Purple
+    Preparation: '#A5D6A7',
+    Care: '#80DEEA',
+    Harvest: '#FFF176',
+    Check: '#CE93D8',
 };
 
 export default function TodayScreen() {
@@ -41,8 +39,8 @@ export default function TodayScreen() {
 
     const refresh = useCallback(() => {
         Promise.all([getTodayTasks(), getUpcomingTasks(3)]).then(([today, up]) => {
-            setTasks(today as unknown as TodayTask[]);
-            setUpcoming(up as unknown as TodayTask[]);
+            setTasks(today as TodayTask[]);
+            setUpcoming(up as TodayTask[]);
             setLoading(false);
         });
     }, []);
@@ -63,45 +61,27 @@ export default function TodayScreen() {
         const typeColor = TASK_TYPE_COLORS[item.taskType ?? ''] ?? '#E0E0E0';
         const time = format(new Date(item.task.dueAt), 'h:mm a');
 
-        // Calculate progress
-        let progress = 0;
-        let dayNum = 0;
-        if (item.startDate && item.totalDurationDays) {
-            dayNum = differenceInDays(new Date(), new Date(item.startDate)) + 1;
-            dayNum = Math.max(1, dayNum);
-            progress = Math.min(1, dayNum / item.totalDurationDays);
-        }
-
         return (
             <Surface style={styles.taskCard} elevation={2}>
                 <View style={[styles.typeBar, { backgroundColor: typeColor }]} />
                 <View style={styles.taskBody}>
                     <View style={styles.taskHeader}>
-                        <Text variant="labelSmall" style={{ opacity: 0.6 }}>
-                            {item.templateTitle} {dayNum > 0 ? `· Day ${dayNum}` : ''}
-                        </Text>
+                        <Text variant="labelSmall" style={{ opacity: 0.6 }}>{item.templateTitle}</Text>
                         <Text variant="labelMedium" style={{ fontWeight: '700' }}>{time}</Text>
                     </View>
                     <Text variant="titleMedium" style={styles.taskTitle}>{item.taskTitle}</Text>
                     {item.taskDescription && (
                         <Text variant="bodySmall" style={styles.taskDesc}>{item.taskDescription}</Text>
                     )}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                        <Chip compact style={[styles.typeChip, { backgroundColor: typeColor }]}>
-                            {item.taskType}
-                        </Chip>
-                        {item.totalDurationDays && (
-                            <View style={{ flex: 1, height: 4, borderRadius: 2, overflow: 'hidden', backgroundColor: '#eee' }}>
-                                <ProgressBar progress={progress} color={theme.colors.primary} style={{ height: 4 }} />
-                            </View>
-                        )}
-                    </View>
+                    <Chip compact style={[styles.typeChip, { backgroundColor: typeColor }]}>
+                        {item.taskType}
+                    </Chip>
                 </View>
                 <View style={styles.taskActions}>
                     <IconButton
-                        icon="check-circle"
+                        icon="check-circle-outline"
                         iconColor={theme.colors.primary}
-                        size={32}
+                        size={26}
                         onPress={() => handleAction(item.task.id, 'completed')}
                     />
                     <Menu

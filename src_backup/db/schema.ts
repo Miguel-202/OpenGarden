@@ -64,7 +64,6 @@ export const inventoryItems = sqliteTable('inventory_items', {
   category: text('category', { enum: ['tool', 'consumable'] }).notNull(),
   unitDefault: text('unit_default'),
   notes: text('notes'),
-  isOwned: integer('is_owned', { mode: 'boolean' }).notNull().default(false),
 });
 
 export const shoppingListItems = sqliteTable('shopping_list_items', {
@@ -90,10 +89,8 @@ export const shoppingListLinks = sqliteTable('shopping_list_links', {
 export const runs = sqliteTable('runs', {
   id: text('id').primaryKey(),
   templateId: text('template_id').notNull().references(() => templates.id),
-  customName: text('custom_name').notNull(),
   startDate: integer('start_date', { mode: 'timestamp' }).notNull(),
   status: text('status', { enum: ['active', 'completed', 'archived'] }).notNull().default('active'),
-  isStarted: integer('is_started', { mode: 'boolean' }).notNull().default(false),
 });
 
 export const runRequiredItems = sqliteTable('run_required_items', {

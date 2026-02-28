@@ -4,7 +4,6 @@ export type GlobalItemDef = {
     id: string;
     name: string;
     category: 'tool' | 'consumable';
-    isOwned: boolean;
 };
 
 export type TemplateReqDef = {
@@ -56,17 +55,14 @@ export function buildRunRequirements(
                 id: crypto.randomUUID(),
                 name: req.name,
                 category: req.category,
-                isOwned: false,
             };
             newGlobalItems.push(globalItem);
             globalByName.set(globalItem.name.toLowerCase(), globalItem); // update map
         }
 
-        if (!globalItem) continue; // Should not happen but fixes lint
-
         // Determine initial status
         let initialStatus: 'missing' | 'have' = 'missing';
-        if (req.category === 'tool' && globalItem.isOwned) {
+        if (req.category === 'tool' && !newGlobalItems.includes(globalItem)) {
             // It's a tool and they already owned it globally
             initialStatus = 'have';
         }

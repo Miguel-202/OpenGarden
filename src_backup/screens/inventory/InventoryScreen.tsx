@@ -5,10 +5,9 @@ import {
     TextInput, Button, SegmentedButtons, useTheme, ActivityIndicator,
 } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
-import { getAllInventoryItems, upsertInventoryItem, toggleInventoryItem } from '@/features/api';
-import { Checkbox, Switch } from 'react-native-paper';
+import { getAllInventoryItems, upsertInventoryItem } from '@/features/api';
 
-type Item = { id: string; name: string; category: 'tool' | 'consumable'; unitDefault?: string | null; notes?: string | null; isOwned: boolean; };
+type Item = { id: string; name: string; category: 'tool' | 'consumable'; unitDefault?: string | null; notes?: string | null; };
 
 export default function InventoryScreen() {
     const [items, setItems] = useState<Item[]>([]);
@@ -26,11 +25,6 @@ export default function InventoryScreen() {
     }, []);
 
     useFocusEffect(refresh);
-
-    const handleToggle = async (id: string, current: boolean) => {
-        await toggleInventoryItem(id, !current);
-        refresh();
-    };
 
     const tools = items.filter(i => i.category === 'tool');
     const consumables = items.filter(i => i.category === 'consumable');
@@ -72,16 +66,9 @@ export default function InventoryScreen() {
                                 />
                             )}
                             right={() => (
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text variant="labelSmall" style={{ opacity: 0.6, marginRight: 8 }}>
-                                        {item.isOwned ? 'OWNED' : 'MISSING'}
-                                    </Text>
-                                    <Switch
-                                        value={item.isOwned}
-                                        onValueChange={() => handleToggle(item.id, item.isOwned)}
-                                        color={theme.colors.primary}
-                                    />
-                                </View>
+                                <Chip compact style={styles.categChip}>
+                                    {item.category}
+                                </Chip>
                             )}
                         />
                     </Surface>

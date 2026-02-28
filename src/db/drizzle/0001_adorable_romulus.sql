@@ -1,0 +1,1 @@
+ALTER TABLE `inventory_items` ADD `is_owned` integer DEFAULT false NOT NULL;

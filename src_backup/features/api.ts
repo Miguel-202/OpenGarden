@@ -41,10 +41,6 @@ export async function getAllInventoryItems() {
     return db.select().from(inventoryItems);
 }
 
-export async function toggleInventoryItem(id: string, isOwned: boolean) {
-    await db.update(inventoryItems).set({ isOwned }).where(eq(inventoryItems.id, id));
-}
-
 export async function upsertInventoryItem(
     name: string,
     category: 'tool' | 'consumable',
@@ -115,28 +111,6 @@ export async function getAllRuns() {
     return rows;
 }
 
-export async function getNextRunName(templateId: string, templateTitle: string): Promise<string> {
-    const existing = await db.select().from(runs).where(eq(runs.templateId, templateId));
-    return `${templateTitle} ${existing.length + 1}`;
-}
-
-export async function deleteRun(runId: string) {
-    await db.delete(runTasks).where(eq(runTasks.runId, runId));
-    await db.delete(runRequiredItems).where(eq(runRequiredItems.runId, runId));
-    await db.delete(shoppingListLinks).where(eq(shoppingListLinks.runId, runId));
-    await db.delete(runs).where(eq(runs.id, runId));
-}
-
-export async function activateRun(runId: string) {
-    const detail = await getRunDetail(runId);
-    if (!detail) throw new Error('Run not found');
-    const templateDetail = await getTemplateDetail(detail.run.templateId);
-    if (!templateDetail) throw new Error('Template not found');
-
-    await db.update(runs).set({ isStarted: true }).where(eq(runs.id, runId));
-    await advanceHorizon(runId, detail.run.startDate, templateDetail.tasks);
-}
-
 export async function getRunDetail(runId: string) {
     const runRows = await db.select().from(runs).where(eq(runs.id, runId));
     if (!runRows.length) return null;
@@ -146,8 +120,6 @@ export async function getRunDetail(runId: string) {
         .select({
             req: runRequiredItems,
             itemName: inventoryItems.name,
-            itemNotes: inventoryItems.notes,
-            itemCategory: inventoryItems.category,
         })
         .from(runRequiredItems)
         .leftJoin(inventoryItems, eq(runRequiredItems.itemId, inventoryItems.id))
@@ -168,7 +140,6 @@ export async function updateRequirementStatus(
 export async function startRun(
     templateId: string,
     startDate: Date,
-    customName: string,
 ): Promise<string> {
     const detail = await getTemplateDetail(templateId);
     if (!detail) throw new Error('Template not found');
@@ -179,12 +150,11 @@ export async function startRun(
     await db.insert(runs).values({
         id: runId,
         templateId,
-        customName,
         startDate: startDateTs,
         status: 'active',
-        isStarted: false,
     });
 
+    // Build requirements from template tools + consumables
     const globalInv = await getAllInventoryItems();
     const allReqs = [
         ...detail.tools.map(t => ({ name: t.name, category: 'tool' as const })),
@@ -198,13 +168,18 @@ export async function startRun(
 
     const { stubs, newGlobalItems } = buildRunRequirements(runId, allReqs, globalInv);
 
+    // Insert any newly discovered global items
     for (const item of newGlobalItems) {
         await db.insert(inventoryItems).values({ id: item.id, name: item.name, category: item.category });
     }
 
+    // Insert run requirements
     for (const stub of stubs) {
         await db.insert(runRequiredItems).values(stub);
     }
+
+    // Generate initial rolling horizon tasks (14 days)
+    await advanceHorizon(runId, startDate, detail.tasks);
 
     return runId;
 }
@@ -217,17 +192,10 @@ export async function startStaggeredRuns(
     batchCount: number,
     offsetDays: number,
 ): Promise<string[]> {
-    const detail = await getTemplateDetail(templateId);
-    if (!detail) throw new Error('Template not found');
-    const templateTitle = detail.template.title;
-
-    const existingCount = (await db.select().from(runs).where(eq(runs.templateId, templateId))).length;
-
     const runIds: string[] = [];
     for (let i = 0; i < batchCount; i++) {
         const startDate = addDays(firstStartDate, i * offsetDays);
-        const name = `${templateTitle} ${existingCount + i + 1}`;
-        const id = await startRun(templateId, startDate, name);
+        const id = await startRun(templateId, startDate);
         runIds.push(id);
     }
     return runIds;
@@ -243,6 +211,7 @@ export async function advanceHorizon(
 ) {
     const horizonDate = addDays(new Date(), horizonDays);
 
+    // Get existing task signatures to avoid duplicates
     const existing = await db
         .select({ templateTaskId: runTasks.templateTaskId, dueAt: runTasks.dueAt })
         .from(runTasks)
@@ -277,8 +246,6 @@ export async function getTodayTasks() {
             taskType: templateTasks.taskType,
             taskDescription: templateTasks.description,
             templateTitle: templates.title,
-            startDate: runs.startDate,
-            totalDurationDays: templates.totalDurationDays,
         })
         .from(runTasks)
         .leftJoin(templateTasks, eq(runTasks.templateTaskId, templateTasks.id))
@@ -288,6 +255,7 @@ export async function getTodayTasks() {
             eq(runTasks.status, 'pending'),
         ));
 
+    // Filter to today's tasks in TypeScript (avoids SQLite ISO string comparison gotchas)
     return rows.filter(r => r.task.dueAt >= startOfToday && r.task.dueAt <= endOfToday);
 }
 
@@ -304,8 +272,6 @@ export async function getUpcomingTasks(days = 3) {
             taskType: templateTasks.taskType,
             taskDescription: templateTasks.description,
             templateTitle: templates.title,
-            startDate: runs.startDate,
-            totalDurationDays: templates.totalDurationDays,
         })
         .from(runTasks)
         .leftJoin(templateTasks, eq(runTasks.templateTaskId, templateTasks.id))
@@ -337,7 +303,7 @@ export async function updateTaskStatus(
             const newDue = new Date(task[0].dueAt);
             newDue.setHours(newDue.getHours() + snoozeHours);
             updates.dueAt = newDue.toISOString();
-            updates.status = 'pending';
+            updates.status = 'pending'; // snoozed pushes back to pending at new time
         }
     }
 

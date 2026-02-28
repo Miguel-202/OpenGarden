@@ -122,5 +122,15 @@ export async function seedDatabase() {
         }
     ]);
 
+    // Global Inventory Defaults
+    await db.insert(inventoryItems).values([
+        { id: 'inv_sprout_jar', name: 'Sprouting Jar with Mesh Lid', category: 'tool', unitDefault: 'unit' },
+        { id: 'inv_broccoli_seeds', name: 'Broccoli Sprouting Seeds', category: 'consumable', unitDefault: 'tbsp' },
+        { id: 'inv_pot_4inch', name: '4-inch Nursery Pot with Drainage', category: 'tool', unitDefault: 'unit' },
+        { id: 'inv_saucer', name: 'Plant Saucer', category: 'tool', unitDefault: 'unit' },
+        { id: 'inv_basil_seeds', name: 'Basil Seeds', category: 'consumable', unitDefault: 'seeds' },
+        { id: 'inv_potting_mix', name: 'Potting Mix', category: 'consumable', unitDefault: 'bag' },
+    ]);
+
     console.log('Seeded templates successfully!');
 }
