@@ -7,6 +7,10 @@ import { db } from '@/db';
 import { seedDatabase } from '@/core/seed';
 import { MD3LightTheme as DefaultTheme, PaperProvider, Text } from 'react-native-paper';
 import RootNavigator from '@/navigation/RootNavigator';
+import { configureNotifications, scheduleRollingNotifications } from '@/services/notificationsService';
+
+// Register notification handler before the first render
+configureNotifications();
 
 const theme = {
   ...DefaultTheme,
@@ -23,9 +27,13 @@ export default function App() {
 
   useEffect(() => {
     if (success) {
-      seedDatabase().then(() => setIsSeeded(true)).catch(console.error);
+      seedDatabase()
+        .then(() => setIsSeeded(true))
+        .then(() => scheduleRollingNotifications()) // schedule after seed
+        .catch(console.error);
     }
   }, [success]);
+
 
   if (error) {
     return (
