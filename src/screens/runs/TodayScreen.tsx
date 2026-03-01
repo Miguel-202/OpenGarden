@@ -5,6 +5,7 @@ import {
     ActivityIndicator, useTheme, Menu, ProgressBar,
 } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { getTodayTasks, getUpcomingTasks, updateTaskStatus } from '@/features/api';
 import { shareCarePlan } from '@/services/carePlanService';
 import { format, differenceInDays } from 'date-fns';
@@ -26,10 +27,10 @@ type TodayTask = {
 };
 
 const TASK_TYPE_COLORS: Record<string, string> = {
-    Preparation: '#A5D6A7', // Green
-    Care: '#81D4FA', // Blue
-    Harvest: '#FFF59D', // Yellow
-    Check: '#E1BEE7', // Purple
+    Preparation: '#A5D6A7',
+    Care: '#81D4FA',
+    Harvest: '#FFF59D',
+    Check: '#E1BEE7',
 };
 
 export default function TodayScreen() {
@@ -38,6 +39,7 @@ export default function TodayScreen() {
     const [loading, setLoading] = useState(true);
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
     const theme = useTheme();
+    const { t } = useTranslation();
 
     const refresh = useCallback(() => {
         Promise.all([getTodayTasks(), getUpcomingTasks(3)]).then(([today, up]) => {
@@ -52,7 +54,7 @@ export default function TodayScreen() {
     const handleAction = async (taskId: string, action: 'completed' | 'skipped' | 'snoozed') => {
         setActiveMenu(null);
         if (action === 'snoozed') {
-            await updateTaskStatus(taskId, 'snoozed', 2); // snooze 2 hours
+            await updateTaskStatus(taskId, 'snoozed', 2);
         } else {
             await updateTaskStatus(taskId, action);
         }
@@ -63,7 +65,6 @@ export default function TodayScreen() {
         const typeColor = TASK_TYPE_COLORS[item.taskType ?? ''] ?? '#E0E0E0';
         const time = format(new Date(item.task.dueAt), 'h:mm a');
 
-        // Calculate progress
         let progress = 0;
         let dayNum = 0;
         if (item.startDate && item.totalDurationDays) {
@@ -78,7 +79,7 @@ export default function TodayScreen() {
                 <View style={styles.taskBody}>
                     <View style={styles.taskHeader}>
                         <Text variant="labelSmall" style={{ opacity: 0.6 }}>
-                            {item.templateTitle} {dayNum > 0 ? `· Day ${dayNum}` : ''}
+                            {item.templateTitle} {dayNum > 0 ? `· ${t('common.day', { n: dayNum })}` : ''}
                         </Text>
                         <Text variant="labelMedium" style={{ fontWeight: '700' }}>{time}</Text>
                     </View>
@@ -108,23 +109,11 @@ export default function TodayScreen() {
                         visible={activeMenu === item.task.id}
                         onDismiss={() => setActiveMenu(null)}
                         anchor={
-                            <IconButton
-                                icon="dots-vertical"
-                                size={20}
-                                onPress={() => setActiveMenu(item.task.id)}
-                            />
+                            <IconButton icon="dots-vertical" size={20} onPress={() => setActiveMenu(item.task.id)} />
                         }
                     >
-                        <Menu.Item
-                            leadingIcon="alarm"
-                            onPress={() => handleAction(item.task.id, 'snoozed')}
-                            title="Snooze 2h"
-                        />
-                        <Menu.Item
-                            leadingIcon="skip-next"
-                            onPress={() => handleAction(item.task.id, 'skipped')}
-                            title="Skip"
-                        />
+                        <Menu.Item leadingIcon="alarm" onPress={() => handleAction(item.task.id, 'snoozed')} title={t('today.snooze2h')} />
+                        <Menu.Item leadingIcon="skip-next" onPress={() => handleAction(item.task.id, 'skipped')} title={t('today.skip')} />
                     </Menu>
                 </View>
             </Surface>
@@ -152,17 +141,17 @@ export default function TodayScreen() {
                             mode="outlined"
                             onPress={() => shareCarePlan({ runTitle: 'My Plants' })}
                         >
-                            Share Care Plan
+                            {t('today.shareCarePlan')}
                         </Button>
                     </View>
                     {tasks.length === 0 ? (
                         <Surface style={styles.emptyCard} elevation={1}>
                             <Text variant="bodyLarge" style={{ textAlign: 'center', opacity: 0.6 }}>
-                                No tasks due today 🎉{'\n'}Start a run from the Library.
+                                {t('today.noTasks')}
                             </Text>
                         </Surface>
                     ) : (
-                        <Text variant="titleSmall" style={styles.sectionLabel}>DUE TODAY ({tasks.length})</Text>
+                        <Text variant="titleSmall" style={styles.sectionLabel}>{t('today.dueToday', { n: tasks.length })}</Text>
                     )}
                 </>
             }
@@ -170,7 +159,7 @@ export default function TodayScreen() {
                 upcoming.length > 0 ? (
                     <View>
                         <Divider style={{ marginVertical: 16 }} />
-                        <Text variant="titleSmall" style={styles.sectionLabel}>COMING UP</Text>
+                        <Text variant="titleSmall" style={styles.sectionLabel}>{t('today.comingUp')}</Text>
                         {upcoming.slice(0, 5).map(item => (
                             <Surface key={item.task.id + item.task.dueAt} style={[styles.upcomingCard]} elevation={1}>
                                 <Text variant="bodyMedium" style={{ fontWeight: '600' }}>{item.taskTitle}</Text>

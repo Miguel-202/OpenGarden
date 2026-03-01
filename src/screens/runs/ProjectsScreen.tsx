@@ -5,6 +5,7 @@ import {
     useTheme, ActivityIndicator, IconButton,
 } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import {
     getAllRuns, getRunDetail, updateRequirementStatus,
     deleteRun, activateRun
@@ -29,6 +30,7 @@ export default function ProjectsScreen({ navigation }: any) {
     const [selected, setSelected] = useState<{ run: RunRow; requirements: Requirement[] } | null>(null);
     const [loading, setLoading] = useState(true);
     const theme = useTheme();
+    const { t } = useTranslation();
 
     const refresh = useCallback(() => {
         getAllRuns().then(data => {
@@ -46,12 +48,12 @@ export default function ProjectsScreen({ navigation }: any) {
 
     const handleDelete = (runId: string, name: string) => {
         Alert.alert(
-            'Delete Project?',
-            `Are you sure you want to remove "${name}"? This will delete all associated tasks and history.`,
+            t('projects.deleteProject'),
+            t('projects.deleteProjectMsg', { name }),
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: t('common.cancel'), style: 'cancel' },
                 {
-                    text: 'Delete',
+                    text: t('common.delete'),
                     style: 'destructive',
                     onPress: async () => {
                         await deleteRun(runId);
@@ -65,11 +67,11 @@ export default function ProjectsScreen({ navigation }: any) {
     const handleActivate = async (runId: string) => {
         try {
             await activateRun(runId);
-            Alert.alert('Project Started! 🚀', 'Tasks have been generated and will appear in your Today view.');
+            Alert.alert(t('projects.projectStarted'), t('projects.projectStartedMsg'));
             setSelected(null);
             refresh();
         } catch (e: any) {
-            Alert.alert('Error', e.message);
+            Alert.alert(t('common.error'), e.message);
         }
     };
 
@@ -84,8 +86,8 @@ export default function ProjectsScreen({ navigation }: any) {
 
     const showLearnMore = (req: Requirement) => {
         Alert.alert(
-            req.itemName ?? 'Item Info',
-            `${(req.itemCategory || '').toUpperCase()}\n\n${req.itemNotes || 'No additional description available.'}`
+            req.itemName ?? t('projects.itemInfo'),
+            `${(req.itemCategory || '').toUpperCase()}\n\n${req.itemNotes || t('projects.noDescription')}`
         );
     };
 
@@ -98,12 +100,12 @@ export default function ProjectsScreen({ navigation }: any) {
                 keyExtractor={item => item.run.id}
                 contentContainerStyle={styles.list}
                 ListHeaderComponent={
-                    <Text variant="headlineSmall" style={styles.heading}>Your Projects</Text>
+                    <Text variant="headlineSmall" style={styles.heading}>{t('projects.yourProjects')}</Text>
                 }
                 ListEmptyComponent={
                     <Surface style={styles.emptyCard} elevation={1}>
                         <Text variant="bodyLarge" style={{ textAlign: 'center', opacity: 0.6 }}>
-                            No runs yet.{'\n'}Browse the Library to get started!
+                            {t('projects.noRuns')}
                         </Text>
                     </Surface>
                 }
@@ -113,12 +115,12 @@ export default function ProjectsScreen({ navigation }: any) {
                         <Surface style={styles.runCard} elevation={2}>
                             <List.Item
                                 title={item.run.customName}
-                                description={`${item.templateTitle} · Started ${startDateDisplay}${!item.run.isStarted ? ' · PENDING' : ''}`}
+                                description={`${item.templateTitle} · ${t('projects.started', { date: startDateDisplay })}${!item.run.isStarted ? ` · ${t('projects.pending')}` : ''}`}
                                 left={props => <List.Icon {...props} icon="sprout" color={item.run.isStarted ? theme.colors.primary : '#999'} />}
                                 right={() => (
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Button compact mode="outlined" onPress={() => openDetail(item)} style={{ marginRight: 8 }}>
-                                            Readiness
+                                            {t('projects.readiness')}
                                         </Button>
                                         <IconButton
                                             icon="trash-can-outline"
@@ -143,7 +145,7 @@ export default function ProjectsScreen({ navigation }: any) {
                     {selected && (
                         <ScrollView showsVerticalScrollIndicator={false}>
                             <Text variant="titleLarge" style={styles.modalTitle}>
-                                Readiness: {selected.run.run.customName}
+                                {t('projects.readinessTitle', { name: selected.run.run.customName })}
                             </Text>
                             <Text variant="bodySmall" style={{ marginBottom: 16, opacity: 0.6 }}>
                                 {selected.run.templateTitle}
@@ -169,7 +171,7 @@ export default function ProjectsScreen({ navigation }: any) {
                                                 mode={ok ? 'outlined' : 'contained'}
                                                 onPress={() => toggleReq(req.req.id, req.req.status)}
                                             >
-                                                {ok ? 'Have ✓' : 'Mark Have'}
+                                                {ok ? t('projects.have') : t('projects.markHave')}
                                             </Button>
                                             <IconButton
                                                 icon="information-outline"
@@ -193,7 +195,7 @@ export default function ProjectsScreen({ navigation }: any) {
                                             : '#FFCDD2',
                                     }}
                                 >
-                                    {isRunReady(selected.requirements.map(r => r.req)) ? 'Ready' : 'Incomplete'}
+                                    {isRunReady(selected.requirements.map(r => r.req)) ? t('projects.ready') : t('projects.incomplete')}
                                 </Chip>
 
                                 {!selected.run.run.isStarted && (
@@ -203,7 +205,7 @@ export default function ProjectsScreen({ navigation }: any) {
                                         disabled={!isRunReady(selected.requirements.map(r => r.req))}
                                         onPress={() => handleActivate(selected.run.run.id)}
                                     >
-                                        Start Project
+                                        {t('projects.startProject')}
                                     </Button>
                                 )}
                             </View>
@@ -211,10 +213,10 @@ export default function ProjectsScreen({ navigation }: any) {
                             {!selected.run.run.isStarted && !isRunReady(selected.requirements.map(r => r.req)) && (
                                 <View style={{ marginTop: 12, padding: 8, backgroundColor: '#FFF9C4', borderRadius: 8 }}>
                                     <Text variant="bodySmall" style={{ color: '#FBC02D', fontWeight: 'bold' }}>
-                                        Action Required
+                                        {t('projects.actionRequired')}
                                     </Text>
                                     <Text variant="bodySmall">
-                                        Collect all items and mark them as "Have" to begin.
+                                        {t('projects.actionRequiredMsg')}
                                     </Text>
                                 </View>
                             )}

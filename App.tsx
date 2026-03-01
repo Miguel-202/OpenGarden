@@ -3,11 +3,13 @@ import { StyleSheet, View } from 'react-native';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useEffect, useState } from 'react';
 import migrations from '@/db/drizzle/migrations';
-import { db } from '@/db';
+import { db, expoDb } from '@/db';
 import { seedDatabase } from '@/core/seed';
 import { MD3LightTheme as DefaultTheme, PaperProvider, Text } from 'react-native-paper';
 import RootNavigator from '@/navigation/RootNavigator';
 import { configureNotifications, scheduleRollingNotifications } from '@/services/notificationsService';
+import '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 // Register notification handler before the first render
 configureNotifications();
@@ -21,24 +23,35 @@ const theme = {
   },
 };
 
+function ensureSchemaColumns() {
+  const allTargets = ['templates', 'template_tools', 'template_consumables', 'template_tasks'];
+  for (const table of allTargets) {
+    try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN image_uri text`); } catch {}
+    try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN emoji text`); } catch {}
+  }
+  try { expoDb.execSync(`ALTER TABLE runs ADD COLUMN custom_name text NOT NULL DEFAULT ''`); } catch {}
+  try { expoDb.execSync(`ALTER TABLE runs ADD COLUMN is_started integer NOT NULL DEFAULT 0`); } catch {}
+}
+
 export default function App() {
   const { success, error } = useMigrations(db, migrations);
   const [isSeeded, setIsSeeded] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (success) {
+      ensureSchemaColumns();
       seedDatabase()
         .then(() => setIsSeeded(true))
-        .then(() => scheduleRollingNotifications()) // schedule after seed
+        .then(() => scheduleRollingNotifications())
         .catch(console.error);
     }
   }, [success]);
 
-
   if (error) {
     return (
       <View style={styles.container}>
-        <Text>Migration error: {error.message}</Text>
+        <Text>{t('common.migrationError', { message: error.message })}</Text>
       </View>
     );
   }
@@ -46,7 +59,7 @@ export default function App() {
   if (!success || !isSeeded) {
     return (
       <View style={styles.container}>
-        <Text>Loading local database and templates...</Text>
+        <Text>{t('common.loading')}</Text>
       </View>
     );
   }

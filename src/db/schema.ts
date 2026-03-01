@@ -19,12 +19,16 @@ export const templates = sqliteTable('templates', {
   estimatedDailyTimeMins: integer('estimated_daily_time_mins').notNull(),
   totalDurationDays: integer('total_duration_days').notNull(),
   environment: text('environment').notNull(),
+  imageUri: text('image_uri'),
+  emoji: text('emoji'),
 });
 
 export const templateTools = sqliteTable('template_tools', {
   id: text('id').primaryKey(),
   templateId: text('template_id').notNull().references(() => templates.id),
   name: text('name').notNull(),
+  imageUri: text('image_uri'),
+  emoji: text('emoji'),
 });
 
 export const templateConsumables = sqliteTable('template_consumables', {
@@ -33,6 +37,8 @@ export const templateConsumables = sqliteTable('template_consumables', {
   name: text('name').notNull(),
   quantity: real('quantity').notNull(),
   unit: text('unit').notNull(),
+  imageUri: text('image_uri'),
+  emoji: text('emoji'),
 });
 
 export const templateTasks = sqliteTable('template_tasks', {
@@ -43,9 +49,11 @@ export const templateTasks = sqliteTable('template_tasks', {
   taskType: text('task_type').notNull(),
   windowStartDay: integer('window_start_day').notNull(),
   windowEndDay: integer('window_end_day').notNull(),
-  timeOfDay: text('time_of_day'), // "09:00" for fixed singular tasks
+  timeOfDay: text('time_of_day'),
   isRepeating: integer('is_repeating', { mode: 'boolean' }).notNull().default(false),
-  dailyTimes: text('daily_times'), // JSON array of strings e.g., '["09:00", "21:00"]'
+  dailyTimes: text('daily_times'),
+  imageUri: text('image_uri'),
+  emoji: text('emoji'),
 });
 
 export const templateLinks = sqliteTable('template_links', {

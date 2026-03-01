@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import {
-    templates, templateTools, templateConsumables, templateTasks,
+    templates, templateTools, templateConsumables, templateTasks, templateLinks,
     runs, runRequiredItems, inventoryItems, shoppingListItems, shoppingListLinks, runTasks,
 } from '@/db/schema';
 import { generateRunTasks } from '@/core/schedule';
@@ -33,6 +33,163 @@ export async function getTemplateDetail(id: string): Promise<TemplateDetail | nu
     ]);
 
     return { template: rows[0], tools, consumables, tasks };
+}
+
+// ── Create Template ───────────────────────────────────────────────────────────
+
+export interface CreateTemplateInput {
+    title: string;
+    difficulty: string;
+    estimatedDailyTimeMins: number;
+    totalDurationDays: number;
+    environment: string;
+    imageUri?: string | null;
+    emoji?: string | null;
+    tools: Array<{ name: string; imageUri?: string | null; emoji?: string | null }>;
+    consumables: Array<{ name: string; quantity: number; unit: string; imageUri?: string | null; emoji?: string | null }>;
+    tasks: Array<{
+        title: string;
+        description?: string;
+        taskType: string;
+        windowStartDay: number;
+        windowEndDay: number;
+        timeOfDay?: string;
+        isRepeating: boolean;
+        dailyTimes?: string;
+        imageUri?: string | null;
+        emoji?: string | null;
+    }>;
+}
+
+export async function createTemplate(input: CreateTemplateInput): Promise<string> {
+    const templateId = crypto.randomUUID();
+
+    await db.insert(templates).values({
+        id: templateId,
+        title: input.title,
+        difficulty: input.difficulty,
+        estimatedDailyTimeMins: input.estimatedDailyTimeMins,
+        totalDurationDays: input.totalDurationDays,
+        environment: input.environment,
+        imageUri: input.imageUri ?? null,
+        emoji: input.emoji ?? null,
+    });
+
+    for (const tool of input.tools) {
+        await db.insert(templateTools).values({
+            id: crypto.randomUUID(),
+            templateId,
+            name: tool.name,
+            imageUri: tool.imageUri ?? null,
+            emoji: tool.emoji ?? null,
+        });
+    }
+
+    for (const c of input.consumables) {
+        await db.insert(templateConsumables).values({
+            id: crypto.randomUUID(),
+            templateId,
+            name: c.name,
+            quantity: c.quantity,
+            unit: c.unit,
+            imageUri: c.imageUri ?? null,
+            emoji: c.emoji ?? null,
+        });
+    }
+
+    for (const t of input.tasks) {
+        await db.insert(templateTasks).values({
+            id: crypto.randomUUID(),
+            templateId,
+            title: t.title,
+            description: t.description ?? null,
+            taskType: t.taskType,
+            windowStartDay: t.windowStartDay,
+            windowEndDay: t.windowEndDay,
+            timeOfDay: t.timeOfDay ?? null,
+            isRepeating: t.isRepeating,
+            dailyTimes: t.dailyTimes ?? null,
+            imageUri: t.imageUri ?? null,
+            emoji: t.emoji ?? null,
+        });
+    }
+
+    return templateId;
+}
+
+export async function updateTemplate(templateId: string, input: CreateTemplateInput): Promise<void> {
+    await db.update(templates).set({
+        title: input.title,
+        difficulty: input.difficulty,
+        estimatedDailyTimeMins: input.estimatedDailyTimeMins,
+        totalDurationDays: input.totalDurationDays,
+        environment: input.environment,
+        imageUri: input.imageUri ?? null,
+        emoji: input.emoji ?? null,
+    }).where(eq(templates.id, templateId));
+
+    await db.delete(templateTools).where(eq(templateTools.templateId, templateId));
+    await db.delete(templateConsumables).where(eq(templateConsumables.templateId, templateId));
+    await db.delete(templateTasks).where(eq(templateTasks.templateId, templateId));
+
+    for (const tool of input.tools) {
+        await db.insert(templateTools).values({
+            id: crypto.randomUUID(), templateId, name: tool.name,
+            imageUri: tool.imageUri ?? null, emoji: tool.emoji ?? null,
+        });
+    }
+    for (const c of input.consumables) {
+        await db.insert(templateConsumables).values({
+            id: crypto.randomUUID(), templateId, name: c.name,
+            quantity: c.quantity, unit: c.unit,
+            imageUri: c.imageUri ?? null, emoji: c.emoji ?? null,
+        });
+    }
+    for (const t of input.tasks) {
+        await db.insert(templateTasks).values({
+            id: crypto.randomUUID(), templateId, title: t.title,
+            description: t.description ?? null, taskType: t.taskType,
+            windowStartDay: t.windowStartDay, windowEndDay: t.windowEndDay,
+            timeOfDay: t.timeOfDay ?? null, isRepeating: t.isRepeating,
+            dailyTimes: t.dailyTimes ?? null,
+            imageUri: t.imageUri ?? null, emoji: t.emoji ?? null,
+        });
+    }
+}
+
+export async function deleteTemplate(templateId: string) {
+    const templateRuns = await db.select({ id: runs.id }).from(runs).where(eq(runs.templateId, templateId));
+    for (const run of templateRuns) {
+        await deleteRun(run.id);
+    }
+    await db.delete(templateTasks).where(eq(templateTasks.templateId, templateId));
+    await db.delete(templateConsumables).where(eq(templateConsumables.templateId, templateId));
+    await db.delete(templateTools).where(eq(templateTools.templateId, templateId));
+    await db.delete(templateLinks).where(eq(templateLinks.fromTemplateId, templateId));
+    await db.delete(templates).where(eq(templates.id, templateId));
+}
+
+export async function exportTemplateAsJson(templateId: string): Promise<string> {
+    const detail = await getTemplateDetail(templateId);
+    if (!detail) throw new Error('Template not found');
+
+    return JSON.stringify({
+        title: detail.template.title,
+        difficulty: detail.template.difficulty,
+        estimatedDailyTimeMins: detail.template.estimatedDailyTimeMins,
+        totalDurationDays: detail.template.totalDurationDays,
+        environment: detail.template.environment,
+        tools: detail.tools.map(t => ({ name: t.name })),
+        consumables: detail.consumables.map(c => ({
+            name: c.name, quantity: c.quantity, unit: c.unit,
+        })),
+        tasks: detail.tasks.map(t => ({
+            title: t.title, description: t.description, taskType: t.taskType,
+            windowStartDay: t.windowStartDay, windowEndDay: t.windowEndDay,
+            timeOfDay: t.timeOfDay, isRepeating: t.isRepeating,
+            dailyTimes: t.dailyTimes ? JSON.parse(t.dailyTimes) : null,
+        })),
+    });
 }
 
 // ── Inventory queries ─────────────────────────────────────────────────────────

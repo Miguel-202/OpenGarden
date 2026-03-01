@@ -15,6 +15,13 @@
       "when": 1772256487480,
       "tag": "0001_adorable_romulus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1772330000000,
+      "tag": "0002_add_image_uri",
+      "breakpoints": true
     }
   ]
 }

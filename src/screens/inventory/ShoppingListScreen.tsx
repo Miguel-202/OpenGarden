@@ -5,6 +5,7 @@ import {
     ActivityIndicator, Chip, IconButton,
 } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { getShoppingList, toggleShoppingItem } from '@/features/api';
 import { ShoppingCart } from 'lucide-react-native';
 
@@ -22,6 +23,7 @@ export default function ShoppingListScreen() {
     const [items, setItems] = useState<ShoppingItem[]>([]);
     const [loading, setLoading] = useState(true);
     const theme = useTheme();
+    const { t } = useTranslation();
 
     const refresh = useCallback(() => {
         getShoppingList().then(data => {
@@ -52,12 +54,12 @@ export default function ShoppingListScreen() {
                     <>
                         <View style={styles.header}>
                             <ShoppingCart size={22} color={theme.colors.primary} />
-                            <Text variant="headlineSmall" style={styles.heading}>Shopping List</Text>
+                            <Text variant="headlineSmall" style={styles.heading}>{t('shopping.shoppingList')}</Text>
                         </View>
                         {items.length === 0 && (
                             <Surface style={styles.empty} elevation={1}>
                                 <Text variant="bodyLarge" style={{ opacity: 0.6, textAlign: 'center' }}>
-                                    No items yet.{'\n'}Add a template to your projects to auto-populate.
+                                    {t('shopping.noItems')}
                                 </Text>
                             </Surface>
                         )}

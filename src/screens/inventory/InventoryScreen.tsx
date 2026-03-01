@@ -5,6 +5,7 @@ import {
     TextInput, Button, SegmentedButtons, useTheme, ActivityIndicator,
 } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { getAllInventoryItems, upsertInventoryItem, toggleInventoryItem } from '@/features/api';
 import { Checkbox, Switch } from 'react-native-paper';
 
@@ -17,6 +18,7 @@ export default function InventoryScreen() {
     const [newName, setNewName] = useState('');
     const [newCategory, setNewCategory] = useState<'tool' | 'consumable'>('tool');
     const theme = useTheme();
+    const { t } = useTranslation();
 
     const refresh = useCallback(() => {
         getAllInventoryItems().then(data => {
@@ -35,8 +37,8 @@ export default function InventoryScreen() {
     const tools = items.filter(i => i.category === 'tool');
     const consumables = items.filter(i => i.category === 'consumable');
     const sections = [
-        { title: '🔧 Tools (Reusable)', data: tools },
-        { title: '🌱 Consumables', data: consumables },
+        { title: t('inventory.tools'), data: tools },
+        { title: t('inventory.consumables'), data: consumables },
     ];
 
     const handleAdd = async () => {
@@ -74,7 +76,7 @@ export default function InventoryScreen() {
                             right={() => (
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Text variant="labelSmall" style={{ opacity: 0.6, marginRight: 8 }}>
-                                        {item.isOwned ? 'OWNED' : 'MISSING'}
+                                        {item.isOwned ? t('inventory.owned') : t('inventory.missing')}
                                     </Text>
                                     <Switch
                                         value={item.isOwned}
@@ -91,7 +93,7 @@ export default function InventoryScreen() {
             />
             <FAB
                 icon="plus"
-                label="Add Item"
+                label={t('inventory.addItem')}
                 style={[styles.fab, { backgroundColor: theme.colors.primary }]}
                 color="white"
                 onPress={() => setModalVisible(true)}
@@ -102,9 +104,9 @@ export default function InventoryScreen() {
                     onDismiss={() => setModalVisible(false)}
                     contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.surface }]}
                 >
-                    <Text variant="titleLarge" style={styles.modalTitle}>Add Inventory Item</Text>
+                    <Text variant="titleLarge" style={styles.modalTitle}>{t('inventory.addInventoryItem')}</Text>
                     <TextInput
-                        label="Item Name"
+                        label={t('inventory.itemName')}
                         value={newName}
                         onChangeText={setNewName}
                         mode="outlined"
@@ -115,12 +117,12 @@ export default function InventoryScreen() {
                         onValueChange={v => setNewCategory(v as 'tool' | 'consumable')}
                         style={styles.segmented}
                         buttons={[
-                            { value: 'tool', label: 'Tool' },
-                            { value: 'consumable', label: 'Consumable' },
+                            { value: 'tool', label: t('inventory.tool') },
+                            { value: 'consumable', label: t('inventory.consumable') },
                         ]}
                     />
                     <Button mode="contained" onPress={handleAdd} disabled={!newName.trim()} style={styles.addBtn}>
-                        Add to Inventory
+                        {t('inventory.addToInventory')}
                     </Button>
                 </Modal>
             </Portal>
