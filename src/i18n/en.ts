@@ -29,6 +29,7 @@ export default {
     projects: 'Projects',
     library: 'Library',
     inventory: 'Inventory',
+    about: 'About',
   },
   library: {
     growingGuides: 'Growing Guides',
@@ -219,5 +220,20 @@ export default {
   shopping: {
     shoppingList: 'Shopping List',
     noItems: 'No items yet.\nAdd a template to your projects to auto-populate.',
+  },
+  about: {
+    tagline: 'Your open-source, fully offline gardening companion.',
+    openSourceTitle: 'Open Source',
+    openSourceBody: 'Open Garden is 100% free and open source. No accounts, no cloud, no tracking. Your data stays on your device, always. The entire codebase is available for anyone to inspect, contribute to, or fork.',
+    viewOnGithub: 'View on GitHub',
+    howToUseTitle: 'How to Use',
+    howToUseBody: '1. Browse the Library for growing guides, or create your own.\n2. Start a Project from any guide — it tracks your tools, supplies, and schedule.\n3. Check Today daily for due tasks — mark them done, snooze, or skip.\n4. Use Inventory to track what you own and what you still need.\n\nStagger multiple batches for continuous harvests!',
+    contributeTitle: 'Contribute',
+    contributeBody: 'Open Garden thrives on community contributions. You can help by:\n\n• Reporting bugs or suggesting features on GitHub\n• Submitting pull requests with improvements\n• Translating the app into more languages\n• Creating and sharing growing guides\n• Spreading the word to fellow gardeners',
+    contributeBtn: 'Contribute on GitHub',
+    supportTitle: 'Support Development',
+    supportBody: 'Open Garden is built with love in spare time. If it helps you grow something amazing, consider buying the developers a coffee to keep the project alive and thriving.',
+    buyMeACoffee: 'Buy Me a Coffee',
+    footer: 'Made with 🌱 by the Open Garden community',
   },
 };

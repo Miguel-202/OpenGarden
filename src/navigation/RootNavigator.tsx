@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, Sprout, Library, Backpack } from 'lucide-react-native';
+import { Home, Sprout, Library, Backpack, Info } from 'lucide-react-native';
 import { IconButton } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/i18n';
@@ -15,6 +15,7 @@ import InventoryScreen from '@/screens/inventory/InventoryScreen';
 import ShoppingListScreen from '@/screens/inventory/ShoppingListScreen';
 import TodayScreen from '@/screens/runs/TodayScreen';
 import ProjectsScreen from '@/screens/runs/ProjectsScreen';
+import AboutScreen from '@/screens/about/AboutScreen';
 
 const Tab = createBottomTabNavigator();
 const LibraryStack = createNativeStackNavigator();
@@ -109,6 +110,15 @@ function TabNavigator() {
                 options={{
                     tabBarLabel: t('tabs.inventory'),
                     tabBarIcon: ({ color, size }) => <Backpack color={color} size={size} />,
+                }}
+            />
+            <Tab.Screen
+                name="About"
+                component={AboutScreen}
+                options={{
+                    headerShown: true,
+                    tabBarLabel: t('tabs.about'),
+                    tabBarIcon: ({ color, size }) => <Info color={color} size={size} />,
                 }}
             />
         </Tab.Navigator>

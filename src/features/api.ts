@@ -278,10 +278,43 @@ export async function getNextRunName(templateId: string, templateTitle: string):
 }
 
 export async function deleteRun(runId: string) {
+    const linkedShoppingIds = await db
+        .select({ sid: shoppingListLinks.shoppingListItemId })
+        .from(shoppingListLinks)
+        .where(eq(shoppingListLinks.runId, runId));
+
+    const linkedInventoryIds = await db
+        .select({ iid: runRequiredItems.itemId })
+        .from(runRequiredItems)
+        .where(eq(runRequiredItems.runId, runId));
+
     await db.delete(runTasks).where(eq(runTasks.runId, runId));
     await db.delete(runRequiredItems).where(eq(runRequiredItems.runId, runId));
     await db.delete(shoppingListLinks).where(eq(shoppingListLinks.runId, runId));
     await db.delete(runs).where(eq(runs.id, runId));
+
+    for (const { sid } of linkedShoppingIds) {
+        const remaining = await db
+            .select({ id: shoppingListLinks.id })
+            .from(shoppingListLinks)
+            .where(eq(shoppingListLinks.shoppingListItemId, sid));
+        if (remaining.length === 0) {
+            await db.delete(shoppingListItems).where(eq(shoppingListItems.id, sid));
+        }
+    }
+
+    for (const { iid } of linkedInventoryIds) {
+        const stillUsed = await db
+            .select({ id: runRequiredItems.id })
+            .from(runRequiredItems)
+            .where(eq(runRequiredItems.itemId, iid));
+        if (stillUsed.length === 0) {
+            const rows = await db.select().from(inventoryItems).where(eq(inventoryItems.id, iid));
+            if (rows.length > 0 && !rows[0].isOwned) {
+                await db.delete(inventoryItems).where(eq(inventoryItems.id, iid));
+            }
+        }
+    }
 }
 
 export async function activateRun(runId: string) {

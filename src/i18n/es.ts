@@ -29,6 +29,7 @@ export default {
     projects: 'Proyectos',
     library: 'Biblioteca',
     inventory: 'Inventario',
+    about: 'Acerca de',
   },
   library: {
     growingGuides: 'Guías de Cultivo',
@@ -219,5 +220,20 @@ export default {
   shopping: {
     shoppingList: 'Lista de Compras',
     noItems: 'Aún no hay elementos.\nAgrega una plantilla a tus proyectos para auto-completar.',
+  },
+  about: {
+    tagline: 'Tu compañero de jardinería de código abierto, completamente offline.',
+    openSourceTitle: 'Código Abierto',
+    openSourceBody: 'Open Garden es 100% gratuito y de código abierto. Sin cuentas, sin nube, sin rastreo. Tus datos permanecen en tu dispositivo, siempre. Todo el código está disponible para que cualquiera lo inspeccione, contribuya o bifurque.',
+    viewOnGithub: 'Ver en GitHub',
+    howToUseTitle: 'Cómo Usar',
+    howToUseBody: '1. Explora la Biblioteca de guías de cultivo o crea las tuyas.\n2. Inicia un Proyecto desde cualquier guía — rastrea herramientas, insumos y calendario.\n3. Revisa Hoy diariamente para tareas pendientes — márcalas como hechas, pospón u omite.\n4. Usa Inventario para saber qué tienes y qué necesitas.\n\n¡Escalona múltiples lotes para cosechas continuas!',
+    contributeTitle: 'Contribuir',
+    contributeBody: 'Open Garden prospera con las contribuciones de la comunidad. Puedes ayudar:\n\n• Reportando errores o sugiriendo funciones en GitHub\n• Enviando pull requests con mejoras\n• Traduciendo la app a más idiomas\n• Creando y compartiendo guías de cultivo\n• Difundiendo la palabra entre jardineros',
+    contributeBtn: 'Contribuir en GitHub',
+    supportTitle: 'Apoyar el Desarrollo',
+    supportBody: 'Open Garden se construye con amor en tiempo libre. Si te ayuda a cultivar algo increíble, considera invitar un café a los desarrolladores para mantener el proyecto vivo y creciendo.',
+    buyMeACoffee: 'Invítame un Café',
+    footer: 'Hecho con 🌱 por la comunidad de Open Garden',
   },
 };

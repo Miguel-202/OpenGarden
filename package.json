@@ -1,5 +1,5 @@
 {
-  "name": "open-gardem",
+  "name": "open-garden",
   "version": "1.0.0",
   "main": "expo/AppEntry",
   "scripts": {
@@ -7,7 +7,11 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest"
+    "test": "jest",
+    "build:ios": "eas build --platform ios --profile production",
+    "build:preview": "eas build --platform ios --profile preview",
+    "submit:ios": "eas submit --platform ios --profile production",
+    "deploy:ios": "eas build --platform ios --profile production --auto-submit"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -31,7 +35,8 @@
     "react-native-paper": "^5.15.0",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.11",
+    "expo-crypto": "~15.0.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.14",
@@ -40,7 +45,6 @@
     "babel-plugin-module-resolver": "^5.0.2",
     "babel-preset-expo": "~54.0.10",
     "drizzle-kit": "^0.31.9",
-    "expo-crypto": "~15.0.0",
     "jest": "~29.7.0",
     "jest-expo": "~54.0.0",
     "ts-jest": "^29.2.5",

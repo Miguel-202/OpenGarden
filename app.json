@@ -1,34 +1,61 @@
 {
   "expo": {
-    "name": "OpenGarden",
-    "slug": "OpenGarden",
+    "name": "Open Garden",
+    "slug": "open-garden",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "opengarden",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.opengarden.app",
+      "buildNumber": "2",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Open Garden needs access to your photo library to add images to your growing guides.",
+        "NSCameraUsageDescription": "Open Garden needs camera access to take photos of your plants and tools.",
+        "CFBundleAllowMixedLocalizations": true,
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.opengarden.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-sqlite",
-      "expo-localization"
-    ]
+      "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Open Garden needs access to your photos to add images to growing guides.",
+          "cameraPermission": "Open Garden needs camera access to take photos of your plants."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a4a94369-ea4a-4ddf-9d26-c9426aacc4e6"
+      }
+    },
+    "owner": "mikytinez"
   }
 }
