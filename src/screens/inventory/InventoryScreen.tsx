@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, SectionList, StyleSheet, Alert } from 'react-native';
+import { View, SectionList, StyleSheet, Alert, InteractionManager } from 'react-native';
 import {
     Text, Surface, FAB, Chip, List, Divider, Portal, Modal,
     TextInput, Button, SegmentedButtons, useTheme, ActivityIndicator,
@@ -27,7 +27,14 @@ export default function InventoryScreen() {
         });
     }, []);
 
-    useFocusEffect(refresh);
+    useFocusEffect(
+        useCallback(() => {
+            const task = InteractionManager.runAfterInteractions(() => {
+                refresh();
+            });
+            return () => task.cancel();
+        }, [refresh])
+    );
 
     const handleToggle = async (id: string, current: boolean) => {
         await toggleInventoryItem(id, !current);

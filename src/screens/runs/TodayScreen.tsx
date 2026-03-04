@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, Alert, InteractionManager } from 'react-native';
 import {
     Text, Surface, Button, Chip, List, Divider, IconButton,
     ActivityIndicator, useTheme, Menu, ProgressBar,
@@ -49,7 +49,14 @@ export default function TodayScreen() {
         });
     }, []);
 
-    useFocusEffect(refresh);
+    useFocusEffect(
+        useCallback(() => {
+            const task = InteractionManager.runAfterInteractions(() => {
+                refresh();
+            });
+            return () => task.cancel();
+        }, [refresh])
+    );
 
     const handleAction = async (taskId: string, action: 'completed' | 'skipped' | 'snoozed') => {
         setActiveMenu(null);

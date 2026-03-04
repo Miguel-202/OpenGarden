@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, FlatList, StyleSheet, Pressable, Image } from 'react-native';
+import { View, FlatList, StyleSheet, Pressable, Image, InteractionManager } from 'react-native';
 import { Text, Surface, Chip, ActivityIndicator, useTheme } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -25,10 +25,13 @@ export default function LibraryScreen({ navigation }: any) {
 
     useFocusEffect(
         useCallback(() => {
-            getAllTemplates().then(data => {
-                setTemplates(data as Template[]);
-                setLoading(false);
+            const task = InteractionManager.runAfterInteractions(() => {
+                getAllTemplates().then(data => {
+                    setTemplates(data as Template[]);
+                    setLoading(false);
+                });
             });
+            return () => task.cancel();
         }, [])
     );
 

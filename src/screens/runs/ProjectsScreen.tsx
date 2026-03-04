@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, FlatList, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, FlatList, StyleSheet, Alert, ScrollView, InteractionManager } from 'react-native';
 import {
     Text, Surface, Button, Chip, List, Divider, Portal, Modal,
     useTheme, ActivityIndicator, IconButton,
@@ -39,7 +39,14 @@ export default function ProjectsScreen({ navigation }: any) {
         });
     }, []);
 
-    useFocusEffect(refresh);
+    useFocusEffect(
+        useCallback(() => {
+            const task = InteractionManager.runAfterInteractions(() => {
+                refresh();
+            });
+            return () => task.cancel();
+        }, [refresh])
+    );
 
     const openDetail = async (row: RunRow) => {
         const detail = await getRunDetail(row.run.id);

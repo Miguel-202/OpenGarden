@@ -3,14 +3,14 @@ import { View, ScrollView, StyleSheet, Linking } from 'react-native';
 import { Text, Surface, Button, Divider, useTheme } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 
-const GITHUB_URL = 'https://github.com/OpenGardenApp/OpenGarden';
-const BMC_URL = 'https://buymeacoffee.com/opengarden';
+const GITHUB_URL = 'https://github.com/Miguel-202/OpenGarden';
+const BMC_URL = 'https://buymeacoffee.com/mikytinez';
 
 export default function AboutScreen() {
     const theme = useTheme();
     const { t } = useTranslation();
 
-    const openLink = (url: string) => Linking.openURL(url).catch(() => {});
+    const openLink = (url: string) => Linking.openURL(url).catch(() => { });
 
     return (
         <ScrollView
