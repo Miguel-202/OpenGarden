@@ -10,6 +10,7 @@ import { getTodayTasks, getUpcomingTasks, updateTaskStatus } from '@/features/ap
 import { shareCarePlan } from '@/services/carePlanService';
 import { format, differenceInDays } from 'date-fns';
 import { Share2 } from 'lucide-react-native';
+import Dashboard from '@/components/Dashboard';
 
 type TodayTask = {
     task: {
@@ -163,20 +164,23 @@ export default function TodayScreen() {
                 </>
             }
             ListFooterComponent={
-                upcoming.length > 0 ? (
-                    <View>
-                        <Divider style={{ marginVertical: 16 }} />
-                        <Text variant="titleSmall" style={styles.sectionLabel}>{t('today.comingUp')}</Text>
-                        {upcoming.slice(0, 5).map(item => (
-                            <Surface key={item.task.id + item.task.dueAt} style={[styles.upcomingCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
-                                <Text variant="bodyMedium" style={{ fontWeight: '600' }}>{item.taskTitle}</Text>
-                                <Text variant="labelSmall" style={{ opacity: 0.5 }}>
-                                    {format(new Date(item.task.dueAt), 'EEE h:mm a')} · {item.templateTitle}
-                                </Text>
-                            </Surface>
-                        ))}
-                    </View>
-                ) : null
+                <View>
+                    {upcoming.length > 0 && (
+                        <View>
+                            <Divider style={{ marginVertical: 16 }} />
+                            <Text variant="titleSmall" style={styles.sectionLabel}>{t('today.comingUp')}</Text>
+                            {upcoming.slice(0, 5).map(item => (
+                                <Surface key={item.task.id + item.task.dueAt} style={[styles.upcomingCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
+                                    <Text variant="bodyMedium" style={{ fontWeight: '600' }}>{item.taskTitle}</Text>
+                                    <Text variant="labelSmall" style={{ opacity: 0.5 }}>
+                                        {format(new Date(item.task.dueAt), 'EEE h:mm a')} · {item.templateTitle}
+                                    </Text>
+                                </Surface>
+                            ))}
+                        </View>
+                    )}
+                    <Dashboard />
+                </View>
             }
         />
     );
