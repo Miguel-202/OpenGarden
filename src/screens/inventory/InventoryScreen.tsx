@@ -70,7 +70,7 @@ export default function InventoryScreen() {
                     </Text>
                 )}
                 renderItem={({ item }) => (
-                    <Surface style={styles.itemCard} elevation={1}>
+                    <Surface style={[styles.itemCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
                         <List.Item
                             title={item.name}
                             description={item.notes ?? undefined}

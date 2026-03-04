@@ -30,6 +30,7 @@ export default {
     library: 'Library',
     inventory: 'Inventory',
     about: 'About',
+    settings: 'Settings',
   },
   library: {
     growingGuides: 'Growing Guides',
@@ -235,5 +236,12 @@ export default {
     supportBody: 'Open Garden is built with love in spare time. If it helps you grow something amazing, consider buying the developers a coffee to keep the project alive and thriving.',
     buyMeACoffee: 'Buy Me a Coffee',
     footer: 'Made with 🌱 by the Open Garden community',
+  },
+  settings: {
+    language: 'Language',
+    theme: 'App Theme',
+    green: 'Green',
+    pink: 'Pink',
+    blue: 'Blue',
   },
 };

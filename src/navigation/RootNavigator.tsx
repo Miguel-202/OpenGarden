@@ -1,10 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, Sprout, Library, Backpack, Info } from 'lucide-react-native';
+import { Home, Sprout, Library, Backpack, Settings } from 'lucide-react-native';
 import { IconButton } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/i18n';
+import { useAppTheme } from '@/theme/ThemeContext';
 
 import LibraryScreen from '@/screens/templates/LibraryScreen';
 import TemplateDetailScreen from '@/screens/templates/TemplateDetailScreen';
@@ -15,7 +16,7 @@ import InventoryScreen from '@/screens/inventory/InventoryScreen';
 import ShoppingListScreen from '@/screens/inventory/ShoppingListScreen';
 import TodayScreen from '@/screens/runs/TodayScreen';
 import ProjectsScreen from '@/screens/runs/ProjectsScreen';
-import AboutScreen from '@/screens/about/AboutScreen';
+import SettingsScreen from '@/screens/settings/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
 const LibraryStack = createNativeStackNavigator();
@@ -23,8 +24,14 @@ const InventoryStack = createNativeStackNavigator();
 
 function LibraryNavigator() {
     const { t } = useTranslation();
+    const { theme } = useAppTheme();
     return (
-        <LibraryStack.Navigator>
+        <LibraryStack.Navigator
+            screenOptions={{
+                headerStyle: { backgroundColor: theme.colors.primaryContainer },
+                headerTintColor: theme.colors.onPrimaryContainer,
+            }}
+        >
             <LibraryStack.Screen
                 name="LibraryRoot"
                 component={LibraryScreen}
@@ -49,8 +56,14 @@ function LibraryNavigator() {
 
 function InventoryNavigator() {
     const { t } = useTranslation();
+    const { theme } = useAppTheme();
     return (
-        <InventoryStack.Navigator>
+        <InventoryStack.Navigator
+            screenOptions={{
+                headerStyle: { backgroundColor: theme.colors.primaryContainer },
+                headerTintColor: theme.colors.onPrimaryContainer,
+            }}
+        >
             <InventoryStack.Screen name="InventoryRoot" component={InventoryScreen} options={{ title: t('nav.inventory') }} />
             <InventoryStack.Screen name="ShoppingList" component={ShoppingListScreen} options={{ title: t('nav.shoppingList') }} />
         </InventoryStack.Navigator>
@@ -59,6 +72,7 @@ function InventoryNavigator() {
 
 function TabNavigator() {
     const { t, i18n } = useTranslation();
+    const { theme } = useAppTheme();
 
     const toggleLanguage = () => {
         setLanguage(i18n.language === 'es' ? 'en' : 'es');
@@ -68,7 +82,11 @@ function TabNavigator() {
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: '#2E7D32',
+                tabBarActiveTintColor: theme.colors.primary,
+                tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
+                tabBarStyle: { backgroundColor: theme.colors.primaryContainer },
+                headerStyle: { backgroundColor: theme.colors.primaryContainer },
+                headerTintColor: theme.colors.onPrimaryContainer,
             }}
         >
             <Tab.Screen
@@ -78,13 +96,6 @@ function TabNavigator() {
                     headerShown: true,
                     tabBarLabel: t('tabs.today'),
                     tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
-                    headerRight: () => (
-                        <IconButton
-                            icon="translate"
-                            size={22}
-                            onPress={toggleLanguage}
-                        />
-                    ),
                 }}
             />
             <Tab.Screen
@@ -113,12 +124,12 @@ function TabNavigator() {
                 }}
             />
             <Tab.Screen
-                name="About"
-                component={AboutScreen}
+                name="Settings"
+                component={SettingsScreen}
                 options={{
                     headerShown: true,
-                    tabBarLabel: t('tabs.about'),
-                    tabBarIcon: ({ color, size }) => <Info color={color} size={size} />,
+                    tabBarLabel: t('tabs.settings'),
+                    tabBarIcon: ({ color, size }) => <Settings color={color} size={size} />,
                 }}
             />
         </Tab.Navigator>

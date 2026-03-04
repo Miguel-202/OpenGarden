@@ -5,38 +5,31 @@ import { useEffect, useState } from 'react';
 import migrations from '@/db/drizzle/migrations';
 import { db, expoDb } from '@/db';
 import { seedDatabase } from '@/core/seed';
-import { MD3LightTheme as DefaultTheme, PaperProvider, Text } from 'react-native-paper';
+import { PaperProvider, Text } from 'react-native-paper';
 import RootNavigator from '@/navigation/RootNavigator';
 import { configureNotifications, scheduleRollingNotifications } from '@/services/notificationsService';
 import '@/i18n';
 import { useTranslation } from 'react-i18next';
+import { ThemeProvider, useAppTheme } from '@/theme/ThemeContext';
 
 // Register notification handler before the first render
 configureNotifications();
 
-const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#2E7D32', // Leafy green
-    secondary: '#81C784',
-  },
-};
-
 function ensureSchemaColumns() {
   const allTargets = ['templates', 'template_tools', 'template_consumables', 'template_tasks'];
   for (const table of allTargets) {
-    try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN image_uri text`); } catch {}
-    try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN emoji text`); } catch {}
+    try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN image_uri text`); } catch { }
+    try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN emoji text`); } catch { }
   }
-  try { expoDb.execSync(`ALTER TABLE runs ADD COLUMN custom_name text NOT NULL DEFAULT ''`); } catch {}
-  try { expoDb.execSync(`ALTER TABLE runs ADD COLUMN is_started integer NOT NULL DEFAULT 0`); } catch {}
+  try { expoDb.execSync(`ALTER TABLE runs ADD COLUMN custom_name text NOT NULL DEFAULT ''`); } catch { }
+  try { expoDb.execSync(`ALTER TABLE runs ADD COLUMN is_started integer NOT NULL DEFAULT 0`); } catch { }
 }
 
-export default function App() {
+function MainApp() {
   const { success, error } = useMigrations(db, migrations);
   const [isSeeded, setIsSeeded] = useState(false);
   const { t } = useTranslation();
+  const { theme } = useAppTheme();
 
   useEffect(() => {
     if (success) {
@@ -72,6 +65,14 @@ export default function App() {
   );
 }
 
+export default function App() {
+  return (
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -80,3 +81,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+

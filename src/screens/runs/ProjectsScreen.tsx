@@ -119,7 +119,7 @@ export default function ProjectsScreen({ navigation }: any) {
                 renderItem={({ item }) => {
                     const startDateDisplay = format(new Date(item.run.startDate), 'MMM d, yyyy');
                     return (
-                        <Surface style={styles.runCard} elevation={2}>
+                        <Surface style={[styles.runCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={2}>
                             <List.Item
                                 title={item.run.customName}
                                 description={`${item.templateTitle} · ${t('projects.started', { date: startDateDisplay })}${!item.run.isStarted ? ` · ${t('projects.pending')}` : ''}`}

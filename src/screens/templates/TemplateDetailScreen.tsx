@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect } from 'react';
-import { View, ScrollView, StyleSheet, Alert, Image, Share } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, Image, Share, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
 import {
     Text, Surface, Button, Chip, Divider, List, MD3Colors, Banner,
     ActivityIndicator, useTheme, Portal, Modal, TextInput, SegmentedButtons, IconButton,
@@ -127,7 +127,7 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
         try {
             await startRun(templateId, new Date(), plantName || detail.template.title);
             Alert.alert(t('detail.projectCreated'), t('detail.projectCreatedMsg', { name: plantName }), [
-                { text: t('detail.goToProjects'), onPress: () => navigation.navigate('MainTabs', { screen: 'Projects' }) },
+                { text: t('detail.goToProjects'), onPress: () => navigation.navigate('Projects') },
                 { text: t('common.ok') },
             ]);
             setShowOptions(false);
@@ -149,7 +149,7 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
 
             await startStaggeredRuns(templateId, new Date(), count, offset);
             Alert.alert(t('detail.batchCreated'), t('detail.batchCreatedMsg', { count }), [
-                { text: t('detail.goToProjects'), onPress: () => navigation.navigate('MainTabs', { screen: 'Projects' }) },
+                { text: t('detail.goToProjects'), onPress: () => navigation.navigate('Projects') },
                 { text: t('common.ok') },
             ]);
             setShowOptions(false);
@@ -192,7 +192,7 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                 </Surface>
 
                 <Text variant="titleMedium" style={styles.sectionTitle}>{t('detail.toolsSection')}</Text>
-                <Surface style={styles.card} elevation={1}>
+                <Surface style={[styles.card, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
                     {tools.length === 0 && <Text style={styles.empty}>{t('detail.noTools')}</Text>}
                     {tools.map(tool => (
                         <List.Item
@@ -204,7 +204,7 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                 </Surface>
 
                 <Text variant="titleMedium" style={styles.sectionTitle}>{t('detail.consumablesSection')}</Text>
-                <Surface style={styles.card} elevation={1}>
+                <Surface style={[styles.card, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
                     {consumables.length === 0 && <Text style={styles.empty}>{t('detail.noConsumables')}</Text>}
                     {consumables.map(c => (
                         <List.Item
@@ -217,7 +217,7 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                 </Surface>
 
                 <Text variant="titleMedium" style={styles.sectionTitle}>{t('detail.taskSchedule')}</Text>
-                <Surface style={styles.card} elevation={1}>
+                <Surface style={[styles.card, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
                     {tasks.map((task, i) => {
                         const times = task.dailyTimes ? JSON.parse(task.dailyTimes).join(', ') : task.timeOfDay ?? '';
                         const window =
@@ -284,9 +284,85 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
 
             <Portal>
                 <Modal
+                    visible={showOptions}
+                    onDismiss={() => setShowOptions(false)}
+                    contentContainerStyle={[styles.modalStyle, { backgroundColor: theme.colors.surface }]}
+                >
+                    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                    <Text variant="titleLarge" style={styles.modalTitle}>{t('detail.setupPlant')}</Text>
+                                    <IconButton icon="close" size={20} onPress={() => setShowOptions(false)} />
+                                </View>
+
+                                <SegmentedButtons
+                                    value={setupMode}
+                                    onValueChange={setSetupMode}
+                                    style={{ marginBottom: 16 }}
+                                    buttons={[
+                                        { value: 'single', label: t('detail.single') },
+                                        { value: 'staggered', label: t('detail.staggered') },
+                                    ]}
+                                />
+
+                                <TextInput
+                                    label={t('detail.plantNickname')}
+                                    value={plantName}
+                                    onChangeText={setPlantName}
+                                    mode="outlined"
+                                    style={{ marginBottom: 16 }}
+                                    right={<TextInput.Icon icon="pencil" />}
+                                />
+
+                                {setupMode === 'staggered' ? (
+                                    <View>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                                            <Text variant="titleSmall">{t('detail.staggeredSettings')}</Text>
+                                            <IconButton icon="help-circle-outline" size={18} onPress={() => setShowInfo(true)} />
+                                        </View>
+                                        <View style={styles.inputRow}>
+                                            <TextInput
+                                                label={t('detail.batchCount')}
+                                                value={batchCount}
+                                                onChangeText={setBatchCount}
+                                                keyboardType="numeric"
+                                                mode="outlined"
+                                                style={{ flex: 1 }}
+                                            />
+                                            <View style={{ width: 12 }} />
+                                            <TextInput
+                                                label={t('detail.offsetDays')}
+                                                value={offsetDays}
+                                                onChangeText={setOffsetDays}
+                                                keyboardType="numeric"
+                                                mode="outlined"
+                                                style={{ flex: 1 }}
+                                            />
+                                        </View>
+                                    </View>
+                                ) : null}
+
+                                <View style={{ marginTop: 8 }}>
+                                    {setupMode === 'staggered' ? (
+                                        <Button icon="calendar-multiple" mode="contained" onPress={handleStartStaggered} style={styles.optionBtn}>
+                                            {t('detail.launchBatch')}
+                                        </Button>
+                                    ) : (
+                                        <Button icon="sprout" mode="contained" onPress={handleStartSingle} style={styles.optionBtn}>
+                                            {t('detail.startProject')}
+                                        </Button>
+                                    )}
+                                </View>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </KeyboardAvoidingView>
+                </Modal>
+
+                <Modal
                     visible={showInfo}
                     onDismiss={() => setShowInfo(false)}
-                    contentContainerStyle={[styles.modalStyle, { backgroundColor: theme.colors.surface, zIndex: 2000 }]}
+                    contentContainerStyle={[styles.modalStyle, { backgroundColor: theme.colors.surface }]}
                 >
                     <Text variant="titleLarge" style={styles.modalTitle}>{t('detail.staggeredTitle')}</Text>
                     <Text variant="bodyMedium" style={{ marginVertical: 12 }}>
@@ -295,76 +371,6 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                         {t('detail.staggeredBody2')}
                     </Text>
                     <Button mode="contained" onPress={() => setShowInfo(false)}>{t('detail.gotIt')}</Button>
-                </Modal>
-
-                <Modal
-                    visible={showOptions}
-                    onDismiss={() => setShowOptions(false)}
-                    contentContainerStyle={[styles.modalStyle, { backgroundColor: theme.colors.surface }]}
-                >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                        <Text variant="titleLarge" style={styles.modalTitle}>{t('detail.setupPlant')}</Text>
-                        <IconButton icon="close" size={20} onPress={() => setShowOptions(false)} />
-                    </View>
-
-                    <SegmentedButtons
-                        value={setupMode}
-                        onValueChange={setSetupMode}
-                        style={{ marginBottom: 16 }}
-                        buttons={[
-                            { value: 'single', label: t('detail.single') },
-                            { value: 'staggered', label: t('detail.staggered') },
-                        ]}
-                    />
-
-                    <TextInput
-                        label={t('detail.plantNickname')}
-                        value={plantName}
-                        onChangeText={setPlantName}
-                        mode="outlined"
-                        style={{ marginBottom: 16 }}
-                        right={<TextInput.Icon icon="pencil" />}
-                    />
-
-                    {setupMode === 'staggered' ? (
-                        <View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                                <Text variant="titleSmall">{t('detail.staggeredSettings')}</Text>
-                                <IconButton icon="help-circle-outline" size={18} onPress={() => setShowInfo(true)} />
-                            </View>
-                            <View style={styles.inputRow}>
-                                <TextInput
-                                    label={t('detail.batchCount')}
-                                    value={batchCount}
-                                    onChangeText={setBatchCount}
-                                    keyboardType="numeric"
-                                    mode="outlined"
-                                    style={{ flex: 1 }}
-                                />
-                                <View style={{ width: 12 }} />
-                                <TextInput
-                                    label={t('detail.offsetDays')}
-                                    value={offsetDays}
-                                    onChangeText={setOffsetDays}
-                                    keyboardType="numeric"
-                                    mode="outlined"
-                                    style={{ flex: 1 }}
-                                />
-                            </View>
-                            <Button icon="calendar-multiple" mode="contained" onPress={handleStartStaggered} style={styles.optionBtn}>
-                                {t('detail.launchBatch')}
-                            </Button>
-                        </View>
-                    ) : (
-                        <Button icon="sprout" mode="contained" onPress={handleStartSingle} style={styles.optionBtn}>
-                            {t('detail.startProject')}
-                        </Button>
-                    )}
-
-                    <Divider style={{ marginVertical: 12 }} />
-                    <Button mode="text" onPress={() => setShowOptions(false)}>
-                        {t('detail.dismissKeyboard')}
-                    </Button>
                 </Modal>
             </Portal>
         </>

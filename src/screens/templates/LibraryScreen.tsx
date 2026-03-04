@@ -52,7 +52,7 @@ export default function LibraryScreen({ navigation }: any) {
                 }
                 renderItem={({ item }) => (
                     <Pressable onPress={() => navigation.navigate('TemplateDetail', { templateId: item.id })}>
-                        <Surface style={styles.card} elevation={2}>
+                        <Surface style={[styles.card, { backgroundColor: theme.colors.surfaceVariant }]} elevation={2}>
                             {item.imageUri && (
                                 <Image source={{ uri: item.imageUri }} style={styles.cardImage} />
                             )}

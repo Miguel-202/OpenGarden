@@ -81,7 +81,7 @@ export default function TodayScreen() {
         }
 
         return (
-            <Surface style={styles.taskCard} elevation={2}>
+            <Surface style={[styles.taskCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={2}>
                 <View style={[styles.typeBar, { backgroundColor: typeColor }]} />
                 <View style={styles.taskBody}>
                     <View style={styles.taskHeader}>
@@ -168,7 +168,7 @@ export default function TodayScreen() {
                         <Divider style={{ marginVertical: 16 }} />
                         <Text variant="titleSmall" style={styles.sectionLabel}>{t('today.comingUp')}</Text>
                         {upcoming.slice(0, 5).map(item => (
-                            <Surface key={item.task.id + item.task.dueAt} style={[styles.upcomingCard]} elevation={1}>
+                            <Surface key={item.task.id + item.task.dueAt} style={[styles.upcomingCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
                                 <Text variant="bodyMedium" style={{ fontWeight: '600' }}>{item.taskTitle}</Text>
                                 <Text variant="labelSmall" style={{ opacity: 0.5 }}>
                                     {format(new Date(item.task.dueAt), 'EEE h:mm a')} · {item.templateTitle}

@@ -30,6 +30,7 @@ export default {
     library: 'Biblioteca',
     inventory: 'Inventario',
     about: 'Acerca de',
+    settings: 'Ajustes',
   },
   library: {
     growingGuides: 'Guías de Cultivo',
@@ -235,5 +236,12 @@ export default {
     supportBody: 'Open Garden se construye con amor en tiempo libre. Si te ayuda a cultivar algo increíble, considera invitar un café a los desarrolladores para mantener el proyecto vivo y creciendo.',
     buyMeACoffee: 'Invítame un Café',
     footer: 'Hecho con 🌱 por la comunidad de Open Garden',
+  },
+  settings: {
+    language: 'Idioma',
+    theme: 'Tema de la App',
+    green: 'Verde',
+    pink: 'Rosa',
+    blue: 'Azul',
   },
 };
