@@ -21,7 +21,8 @@
       "autoIncrement": true,
       "ios": {
         "image": "latest"
-      }
+      },
+      "channel": "production"
     }
   }
 }

@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.opengarden.app",
-      "buildNumber": "2",
+      "buildNumber": "4",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Open Garden needs access to your photo library to add images to your growing guides.",
         "NSCameraUsageDescription": "Open Garden needs camera access to take photos of your plants and tools.",
@@ -34,6 +34,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
+        "android.permission.RECORD_AUDIO",
         "android.permission.RECORD_AUDIO"
       ]
     },
@@ -56,6 +57,14 @@
         "projectId": "a4a94369-ea4a-4ddf-9d26-c9426aacc4e6"
       }
     },
-    "owner": "mikytinez"
+    "owner": "mikytinez",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a4a94369-ea4a-4ddf-9d26-c9426aacc4e6",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }
