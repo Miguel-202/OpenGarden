@@ -11,6 +11,7 @@ import { shareCarePlan } from '@/services/carePlanService';
 import { format, differenceInDays } from 'date-fns';
 import { Share2 } from 'lucide-react-native';
 import Dashboard from '@/components/Dashboard';
+import { seedT } from '@/i18n/seedKeys';
 
 type TodayTask = {
     task: {
@@ -18,11 +19,13 @@ type TodayTask = {
         dueAt: string;
         status: string;
         note: string | null;
+        templateTaskId?: string;
     };
     taskTitle: string | null;
     taskType: string | null;
     taskDescription: string | null;
     templateTitle: string | null;
+    templateId: string | null;
     startDate: Date | null;
     totalDurationDays: number | null;
 };
@@ -87,13 +90,13 @@ export default function TodayScreen() {
                 <View style={styles.taskBody}>
                     <View style={styles.taskHeader}>
                         <Text variant="labelSmall" style={{ opacity: 0.6 }}>
-                            {item.templateTitle} {dayNum > 0 ? `· ${t('common.day', { n: dayNum })}` : ''}
+                            {seedT(t, item.templateId ?? '', 'title', item.templateTitle)} {dayNum > 0 ? `· ${t('common.day', { n: dayNum })}` : ''}
                         </Text>
                         <Text variant="labelMedium" style={{ fontWeight: '700' }}>{time}</Text>
                     </View>
-                    <Text variant="titleMedium" style={styles.taskTitle}>{item.taskTitle}</Text>
+                    <Text variant="titleMedium" style={styles.taskTitle}>{seedT(t, item.task.templateTaskId ?? '', 'title', item.taskTitle)}</Text>
                     {item.taskDescription && (
-                        <Text variant="bodySmall" style={styles.taskDesc}>{item.taskDescription}</Text>
+                        <Text variant="bodySmall" style={styles.taskDesc}>{seedT(t, item.task.templateTaskId ?? '', 'description', item.taskDescription)}</Text>
                     )}
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
                         <Chip compact style={[styles.typeChip, { backgroundColor: typeColor }]}>

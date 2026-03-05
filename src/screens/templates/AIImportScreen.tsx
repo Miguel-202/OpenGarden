@@ -4,6 +4,7 @@ import { Text, Button, Surface, TextInput, SegmentedButtons, useTheme, Divider }
 import { useTranslation } from 'react-i18next';
 import * as Clipboard from 'expo-clipboard';
 import { createTemplate, type CreateTemplateInput } from '@/features/api';
+import i18n from '@/i18n';
 
 const AI_PROMPT = `You are an expert horticulturist and plant care specialist. I need your help creating a plant care guide for an app called Open Garden.
 
@@ -46,6 +47,53 @@ Field reference:
 
 IMPORTANT: Your final output must be ONLY the raw JSON object. No surrounding text. No markdown. No backticks.`;
 
+const AI_PROMPT_ES = `Eres un horticultor experto y especialista en el cuidado de plantas. Necesito tu ayuda para crear una guía de cuidado de plantas para una app llamada Open Garden.
+
+PASO 1 — CONOCE MI SITUACIÓN
+
+Hazme algunas preguntas rápidas para entender lo que necesito. Adapta tus preguntas a la planta — solo pregunta lo relevante. Ejemplos de buenas preguntas:
+- ¿Qué planta, hierba, vegetal o semilla estás cultivando?
+- ¿Empiezas desde semilla, plántula o trasplante?
+- ¿Dónde vivirá? (alféizar, balcón, patio, cajón elevado, invernadero...)
+- ¿Qué maceta o contenedor tienes, si alguno?
+- ¿Cuánta luz solar recibe el lugar?
+- ¿Cuál es tu clima, región o zona de cultivo?
+- ¿Alguna limitación? (espacio, presupuesto, tiempo, experiencia)
+
+Espera mis respuestas antes de continuar.
+
+PASO 2 — CONSTRUYE LA GUÍA DE CUIDADO CON TU EXPERIENCIA
+
+Basándote en mis respuestas, usa TU conocimiento hortícola para diseñar un plan de cuidado completo. TÚ decides:
+- Las herramientas y suministros que necesitaré
+- Un cronograma completo de tareas desde el día 0 hasta la cosecha o madurez
+- Frecuencia de riego, alimentación, poda, aclareo, endurecimiento, etc.
+- Dificultad realista y tiempo diario
+- Momento adecuado para cada fase de cuidado
+
+NO me preguntes por cronogramas, herramientas o detalles de tareas — ese es TU trabajo como experto.
+
+Luego genera SOLAMENTE un objeto JSON crudo. Sin formato markdown, sin bloques de código, sin acentos graves, sin texto explicativo. Solo el JSON crudo que empieza con { y termina con }.
+
+IMPORTANTE: Todo el contenido del JSON (títulos, descripciones, nombres) debe estar en ESPAÑOL.
+
+Usa esta estructura exacta:
+{"title":"Nombre de Planta (Método)","emoji":"🌿","difficulty":"Beginner","estimatedDailyTimeMins":5,"totalDurationDays":30,"environment":"Alféizar Soleado","tools":[{"name":"Maceta de 10 cm con Drenaje","emoji":"🪴"}],"consumables":[{"name":"Semillas de Albahaca","quantity":5,"unit":"semillas","emoji":"🌱"}],"tasks":[{"title":"Sembrar Semillas","emoji":"🌱","description":"Llena la maceta con tierra húmeda y presiona las semillas suavemente","taskType":"Preparation","windowStartDay":0,"windowEndDay":0,"timeOfDay":"10:00","isRepeating":false,"dailyTimes":null},{"title":"Regar","emoji":"💧","description":"Revisa la superficie, rocía si está seca","taskType":"Care","windowStartDay":1,"windowEndDay":30,"timeOfDay":null,"isRepeating":true,"dailyTimes":["09:00"]}]}
+
+Referencia de campos:
+- difficulty: Beginner, Intermediate o Advanced (mantener en inglés)
+- taskType: Preparation, Care, Harvest, Observation u Other (mantener en inglés)
+- windowStartDay / windowEndDay: números de día (0 = primer día)
+- Todas las horas en formato 24h "HH:MM"
+- Tarea no repetitiva: "isRepeating":false, "timeOfDay":"HH:MM", "dailyTimes":null
+- Tarea repetitiva: "isRepeating":true, "dailyTimes":["HH:MM"], "timeOfDay":null
+
+IMPORTANTE: Tu salida final debe ser SOLAMENTE el objeto JSON crudo. Sin texto alrededor. Sin markdown. Sin acentos graves.`;
+
+function getLocalizedPrompt(): string {
+    return i18n.language?.startsWith('es') ? AI_PROMPT_ES : AI_PROMPT;
+}
+
 export default function AIImportScreen({ navigation }: any) {
     const theme = useTheme();
     const { t } = useTranslation();
@@ -55,7 +103,7 @@ export default function AIImportScreen({ navigation }: any) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
-        await Clipboard.setStringAsync(AI_PROMPT);
+        await Clipboard.setStringAsync(getLocalizedPrompt());
         setCopied(true);
         setTimeout(() => setCopied(false), 2500);
     };
@@ -124,7 +172,7 @@ export default function AIImportScreen({ navigation }: any) {
 
                         <Surface style={styles.promptBox} elevation={1}>
                             <Text variant="bodySmall" style={styles.promptText}>
-                                {AI_PROMPT}
+                                {getLocalizedPrompt()}
                             </Text>
                         </Surface>
 

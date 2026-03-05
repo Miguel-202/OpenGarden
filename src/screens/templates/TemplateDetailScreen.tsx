@@ -14,6 +14,7 @@ import {
 import { resetBuiltinTemplate, BUILTIN_TEMPLATE_IDS } from '@/core/seed';
 import { isRunReady } from '@/core/readiness';
 import type { TemplateDetail } from '@/features/api';
+import { seedT } from '@/i18n/seedKeys';
 import { Info, HelpCircle } from 'lucide-react-native';
 
 export default function TemplateDetailScreen({ route, navigation }: any) {
@@ -181,12 +182,12 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                     )}
                     <View style={styles.heroHeader}>
                         {template.emoji && <Text style={styles.heroEmoji}>{template.emoji}</Text>}
-                        <Text variant="headlineMedium" style={styles.heroTitle}>{template.title}</Text>
+                        <Text variant="headlineMedium" style={styles.heroTitle}>{seedT(t, template.id, 'title', template.title)}</Text>
                     </View>
                     <View style={styles.chips}>
                         <Chip icon="signal-cellular-2">{template.difficulty}</Chip>
                         <Chip icon="calendar-range">{t('common.days', { n: template.totalDurationDays })}</Chip>
-                        <Chip icon="home-outline">{template.environment}</Chip>
+                        <Chip icon="home-outline">{seedT(t, template.id, 'environment', template.environment)}</Chip>
                         <Chip icon="clock-outline">{t('common.minPerDay', { n: template.estimatedDailyTimeMins })}</Chip>
                     </View>
                 </Surface>
@@ -197,7 +198,7 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                     {tools.map(tool => (
                         <List.Item
                             key={tool.id}
-                            title={tool.name}
+                            title={seedT(t, tool.id, 'name', tool.name)}
                             left={renderItemLeft(tool.emoji, tool.imageUri, 'wrench-outline')}
                         />
                     ))}
@@ -209,7 +210,7 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                     {consumables.map(c => (
                         <List.Item
                             key={c.id}
-                            title={c.name}
+                            title={seedT(t, c.id, 'name', c.name)}
                             description={`${c.quantity} ${c.unit}`}
                             left={renderItemLeft(c.emoji, c.imageUri, 'seed-outline')}
                         />
@@ -228,8 +229,8 @@ export default function TemplateDetailScreen({ route, navigation }: any) {
                             <React.Fragment key={task.id}>
                                 {i > 0 && <Divider />}
                                 <List.Item
-                                    title={task.title}
-                                    description={`${window} · ${times}${task.description ? '\n' + task.description : ''}`}
+                                    title={seedT(t, task.id, 'title', task.title)}
+                                    description={`${window} · ${times}${task.description ? '\n' + seedT(t, task.id, 'description', task.description) : ''}`}
                                     descriptionNumberOfLines={3}
                                     left={renderItemLeft(
                                         task.emoji,

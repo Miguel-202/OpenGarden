@@ -467,6 +467,7 @@ export async function getTodayTasks() {
             taskType: templateTasks.taskType,
             taskDescription: templateTasks.description,
             templateTitle: templates.title,
+            templateId: templates.id,
             startDate: runs.startDate,
             totalDurationDays: templates.totalDurationDays,
         })
@@ -494,6 +495,7 @@ export async function getUpcomingTasks(days = 3) {
             taskType: templateTasks.taskType,
             taskDescription: templateTasks.description,
             templateTitle: templates.title,
+            templateId: templates.id,
             startDate: runs.startDate,
             totalDurationDays: templates.totalDurationDays,
         })

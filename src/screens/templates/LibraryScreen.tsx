@@ -4,6 +4,7 @@ import { Text, Surface, Chip, ActivityIndicator, useTheme } from 'react-native-p
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { getAllTemplates } from '@/features/api';
+import { seedT } from '@/i18n/seedKeys';
 import { Sprout, Clock } from 'lucide-react-native';
 
 type Template = {
@@ -62,13 +63,13 @@ export default function LibraryScreen({ navigation }: any) {
                                     : <Sprout size={20} color={theme.colors.primary} />
                                 }
                                 <Text variant="titleMedium" style={[styles.title, { color: theme.colors.onSurface }]}>
-                                    {item.title}
+                                    {seedT(t, item.id, 'title', item.title)}
                                 </Text>
                             </View>
                             <View style={styles.chips}>
                                 <Chip compact icon="signal-cellular-2">{item.difficulty}</Chip>
                                 <Chip compact icon="calendar-range">{t('common.days', { n: item.totalDurationDays })}</Chip>
-                                <Chip compact icon="home-outline">{item.environment}</Chip>
+                                <Chip compact icon="home-outline">{seedT(t, item.id, 'environment', item.environment)}</Chip>
                             </View>
                             <View style={styles.footer}>
                                 <Clock size={14} color={theme.colors.secondary} />
