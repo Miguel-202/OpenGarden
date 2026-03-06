@@ -82,18 +82,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
                 onMomentumScrollEnd={handleScroll}
                 bounces={false}
             >
-                {/* ── Step 1: Welcome ── */}
-                <View style={styles.page}>
-                    <Text style={styles.bigEmoji}>🌱</Text>
-                    <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.primary }]}>
-                        {t('onboarding.welcome')}
-                    </Text>
-                    <Text variant="bodyLarge" style={styles.subtitle}>
-                        {t('onboarding.welcomeSub')}
-                    </Text>
-                </View>
-
-                {/* ── Step 2: Language ── */}
+                {/* ── Step 1: Language ── */}
                 <View style={styles.page}>
                     <Text style={styles.bigEmoji}>🌐</Text>
                     <Text variant="headlineSmall" style={[styles.title, { color: theme.colors.primary }]}>
@@ -128,6 +117,17 @@ export default function OnboardingScreen({ onComplete }: Props) {
                             </Button>
                         </Surface>
                     </View>
+                </View>
+
+                {/* ── Step 2: Welcome ── */}
+                <View style={styles.page}>
+                    <Text style={styles.bigEmoji}>🌱</Text>
+                    <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.primary }]}>
+                        {t('onboarding.welcome')}
+                    </Text>
+                    <Text variant="bodyLarge" style={styles.subtitle}>
+                        {t('onboarding.welcomeSub')}
+                    </Text>
                 </View>
 
                 {/* ── Step 3: Theme ── */}

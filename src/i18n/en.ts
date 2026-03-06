@@ -206,6 +206,7 @@ export default {
     markHave: 'Mark Have',
     ready: 'Ready',
     incomplete: 'Incomplete',
+    incompleteRequirements: 'Missing Requirements',
     startProject: 'Start Project',
     readyToStartMsg: 'Ready to begin? Start the project to see today\'s tasks.',
     actionRequired: 'Action Required',

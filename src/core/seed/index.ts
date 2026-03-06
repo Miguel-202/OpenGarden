@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { templates, templateTools, templateConsumables, templateTasks } from '@/db/schema';
+import { templates, templateTools, templateConsumables, templateTasks, inventoryItems } from '@/db/schema';
 import { count, eq } from 'drizzle-orm';
 
 export const BUILTIN_TEMPLATE_IDS = ['template_broccoli_sprouts', 'template_basil_windowsill', 'template_bonsai_training', 'template_green_onions_water', 'template_mint_cutting', 'template_lettuce_cut_again', 'template_radishes_container', 'template_microgreens_tray', 'template_pothos_lowlight', 'template_cherry_tomato', 'template_welcome_test'];
@@ -654,14 +654,20 @@ async function applyBuiltinEmojis() {
             await db.update(templates).set({ emoji: data.template.emoji }).where(eq(templates.id, data.template.id));
             for (const t of data.tools) {
                 await db.update(templateTools).set({ emoji: t.emoji }).where(eq(templateTools.id, t.id));
+                // Also update global inventory items by name if IDs differ
+                await db.update(inventoryItems).set({ emoji: t.emoji }).where(eq(inventoryItems.name, t.name));
             }
             for (const c of data.consumables) {
                 await db.update(templateConsumables).set({ emoji: c.emoji }).where(eq(templateConsumables.id, c.id));
+                // Also update global inventory items by name if IDs differ
+                await db.update(inventoryItems).set({ emoji: c.emoji }).where(eq(inventoryItems.name, c.name));
             }
             for (const task of data.tasks) {
                 await db.update(templateTasks).set({ emoji: task.emoji }).where(eq(templateTasks.id, task.id));
             }
-        } catch { }
+        } catch (e) {
+            console.error('Failed to apply emojis for built-in template:', data.template.id, e);
+        }
     }
 }
 

@@ -206,6 +206,7 @@ export default {
     markHave: 'Marcar Listo',
     ready: 'Listo',
     incomplete: 'Incompleto',
+    incompleteRequirements: 'Faltan Requisitos',
     startProject: 'Iniciar Proyecto',
     actionRequired: 'Acción Requerida',
     actionRequiredMsg: 'Recolecta todos los elementos y márcalos como "Listo" para comenzar.',

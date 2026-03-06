@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.opengarden.app",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Open Garden needs access to your photo library to add images to your growing guides.",
         "NSCameraUsageDescription": "Open Garden needs camera access to take photos of your plants and tools.",

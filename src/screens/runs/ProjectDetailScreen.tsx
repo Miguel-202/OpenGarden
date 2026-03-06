@@ -181,12 +181,12 @@ export default function ProjectDetailScreen({ navigation }: any) {
                         </Text>
                         <Button
                             mode="contained"
-                            icon="play"
+                            icon={ready ? "play" : "alert-circle-outline"}
                             disabled={!ready}
                             onPress={handleActivate}
                             style={styles.startBtn}
                         >
-                            {t('projects.startProject')}
+                            {ready ? t('projects.startProject') : t('projects.incompleteRequirements')}
                         </Button>
                     </Surface>
                 )}
