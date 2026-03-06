@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { getShoppingList, toggleShoppingItem } from '@/features/api';
 import { ShoppingCart } from 'lucide-react-native';
+import { seedT } from '@/i18n/seedKeys';
 
 type ShoppingItem = {
     id: string;
@@ -78,7 +79,7 @@ export default function ShoppingListScreen() {
                                     variant="bodyLarge"
                                     style={item.checked && { textDecorationLine: 'line-through', opacity: 0.5 }}
                                 >
-                                    {item.name}
+                                    {seedT(t, item.itemId ?? '', 'name', item.name ?? '')}
                                 </Text>
                                 {(item.quantity || item.unit) && (
                                     <Text variant="bodySmall" style={{ opacity: 0.6 }}>

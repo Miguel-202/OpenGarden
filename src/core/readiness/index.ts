@@ -5,13 +5,16 @@ export type GlobalItemDef = {
     name: string;
     category: 'tool' | 'consumable';
     isOwned: boolean;
+    emoji?: string | null;
 };
 
 export type TemplateReqDef = {
+    id?: string;
     name: string;
     category: 'tool' | 'consumable';
     quantity?: number;
     unit?: string;
+    emoji?: string | null;
 };
 
 export type RunRequiredItemStub = {
@@ -53,10 +56,11 @@ export function buildRunRequirements(
         if (!globalItem) {
             // We must create it in the global inventory
             globalItem = {
-                id: crypto.randomUUID(),
+                id: req.id || crypto.randomUUID(),
                 name: req.name,
                 category: req.category,
                 isOwned: false,
+                emoji: req.emoji,
             };
             newGlobalItems.push(globalItem);
             globalByName.set(globalItem.name.toLowerCase(), globalItem); // update map

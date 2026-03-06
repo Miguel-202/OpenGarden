@@ -71,6 +71,7 @@ export const inventoryItems = sqliteTable('inventory_items', {
   name: text('name').notNull(),
   category: text('category', { enum: ['tool', 'consumable'] }).notNull(),
   unitDefault: text('unit_default'),
+  emoji: text('emoji'),
   notes: text('notes'),
   isOwned: integer('is_owned', { mode: 'boolean' }).notNull().default(false),
 });

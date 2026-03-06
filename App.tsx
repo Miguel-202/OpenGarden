@@ -16,7 +16,7 @@ import { ThemeProvider, useAppTheme } from '@/theme/ThemeContext';
 configureNotifications();
 
 function ensureSchemaColumns() {
-  const allTargets = ['templates', 'template_tools', 'template_consumables', 'template_tasks'];
+  const allTargets = ['templates', 'template_tools', 'template_consumables', 'template_tasks', 'inventory_items'];
   for (const table of allTargets) {
     try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN image_uri text`); } catch { }
     try { expoDb.execSync(`ALTER TABLE ${table} ADD COLUMN emoji text`); } catch { }

@@ -6,6 +6,8 @@ import { IconButton } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/i18n';
 import { useAppTheme } from '@/theme/ThemeContext';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import LibraryScreen from '@/screens/templates/LibraryScreen';
 import TemplateDetailScreen from '@/screens/templates/TemplateDetailScreen';
@@ -17,10 +19,13 @@ import ShoppingListScreen from '@/screens/inventory/ShoppingListScreen';
 import TodayScreen from '@/screens/runs/TodayScreen';
 import ProjectsScreen from '@/screens/runs/ProjectsScreen';
 import SettingsScreen from '@/screens/settings/SettingsScreen';
+import OnboardingScreen, { ONBOARDING_KEY } from '@/screens/onboarding/OnboardingScreen';
+import ProjectDetailScreen from '@/screens/runs/ProjectDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const LibraryStack = createNativeStackNavigator();
 const InventoryStack = createNativeStackNavigator();
+const RootStack = createNativeStackNavigator();
 
 function LibraryNavigator() {
     const { t } = useTranslation();
@@ -137,9 +142,36 @@ function TabNavigator() {
 }
 
 export default function RootNavigator() {
+    const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        AsyncStorage.getItem(ONBOARDING_KEY).then(val => {
+            setShowOnboarding(val !== 'true');
+        }).catch(() => setShowOnboarding(true));
+    }, []);
+
+    if (showOnboarding === null) return null; // still loading
+
     return (
         <NavigationContainer>
-            <TabNavigator />
+            <RootStack.Navigator screenOptions={{ headerShown: false }}>
+                {showOnboarding ? (
+                    <RootStack.Screen name="Onboarding">
+                        {() => <OnboardingScreen onComplete={() => setShowOnboarding(false)} />}
+                    </RootStack.Screen>
+                ) : (
+                    <RootStack.Screen name="MainTabs" component={TabNavigator} />
+                )}
+                <RootStack.Screen
+                    name="ProjectDetail"
+                    component={ProjectDetailScreen}
+                    options={{
+                        headerShown: true,
+                        title: '',
+                        headerStyle: { backgroundColor: '#F6F6F6' },
+                    }}
+                />
+            </RootStack.Navigator>
         </NavigationContainer>
     );
 }

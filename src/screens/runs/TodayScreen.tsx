@@ -46,11 +46,17 @@ export default function TodayScreen() {
     const { t } = useTranslation();
 
     const refresh = useCallback(() => {
-        Promise.all([getTodayTasks(), getUpcomingTasks(3)]).then(([today, up]) => {
-            setTasks(today as unknown as TodayTask[]);
-            setUpcoming(up as unknown as TodayTask[]);
-            setLoading(false);
-        });
+        Promise.all([getTodayTasks(), getUpcomingTasks(3)])
+            .then(([today, up]) => {
+                setTasks(today as unknown as TodayTask[]);
+                setUpcoming(up as unknown as TodayTask[]);
+            })
+            .catch(e => {
+                console.error('Failed to fetch today/upcoming tasks:', e);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     }, []);
 
     useFocusEffect(
@@ -174,9 +180,9 @@ export default function TodayScreen() {
                             <Text variant="titleSmall" style={styles.sectionLabel}>{t('today.comingUp')}</Text>
                             {upcoming.slice(0, 5).map(item => (
                                 <Surface key={item.task.id + item.task.dueAt} style={[styles.upcomingCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
-                                    <Text variant="bodyMedium" style={{ fontWeight: '600' }}>{item.taskTitle}</Text>
+                                    <Text variant="bodyMedium" style={{ fontWeight: '600' }}>{seedT(t, item.task.templateTaskId ?? '', 'title', item.taskTitle)}</Text>
                                     <Text variant="labelSmall" style={{ opacity: 0.5 }}>
-                                        {format(new Date(item.task.dueAt), 'EEE h:mm a')} · {item.templateTitle}
+                                        {format(new Date(item.task.dueAt), 'EEE h:mm a')} · {seedT(t, item.templateId ?? '', 'title', item.templateTitle)}
                                     </Text>
                                 </Surface>
                             ))}

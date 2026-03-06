@@ -266,7 +266,12 @@ export async function addToShoppingList(
 
 export async function getAllRuns() {
     const rows = await db
-        .select({ run: runs, templateTitle: templates.title })
+        .select({
+            run: runs,
+            templateTitle: templates.title,
+            templateId: templates.id,
+            templateEmoji: templates.emoji,
+        })
         .from(runs)
         .leftJoin(templates, eq(runs.templateId, templates.id));
     return rows;
@@ -328,14 +333,24 @@ export async function activateRun(runId: string) {
 }
 
 export async function getRunDetail(runId: string) {
-    const runRows = await db.select().from(runs).where(eq(runs.id, runId));
+    const runRows = await db
+        .select({
+            run: runs,
+            template: templates,
+        })
+        .from(runs)
+        .leftJoin(templates, eq(runs.templateId, templates.id))
+        .where(eq(runs.id, runId));
+
     if (!runRows.length) return null;
-    const run = runRows[0];
+    const { run, template } = runRows[0];
 
     const requirements = await db
         .select({
             req: runRequiredItems,
+            itemId: inventoryItems.id,
             itemName: inventoryItems.name,
+            itemEmoji: inventoryItems.emoji,
             itemNotes: inventoryItems.notes,
             itemCategory: inventoryItems.category,
         })
@@ -343,7 +358,7 @@ export async function getRunDetail(runId: string) {
         .leftJoin(inventoryItems, eq(runRequiredItems.itemId, inventoryItems.id))
         .where(eq(runRequiredItems.runId, runId));
 
-    return { run, requirements };
+    return { run, template, requirements };
 }
 
 export async function updateRequirementStatus(
@@ -377,19 +392,26 @@ export async function startRun(
 
     const globalInv = await getAllInventoryItems();
     const allReqs = [
-        ...detail.tools.map(t => ({ name: t.name, category: 'tool' as const })),
+        ...detail.tools.map(t => ({ id: t.id, name: t.name, category: 'tool' as const, emoji: t.emoji })),
         ...detail.consumables.map(c => ({
+            id: c.id,
             name: c.name,
             category: 'consumable' as const,
             quantity: c.quantity,
             unit: c.unit,
+            emoji: c.emoji,
         })),
     ];
 
     const { stubs, newGlobalItems } = buildRunRequirements(runId, allReqs, globalInv);
 
     for (const item of newGlobalItems) {
-        await db.insert(inventoryItems).values({ id: item.id, name: item.name, category: item.category });
+        await db.insert(inventoryItems).values({
+            id: item.id,
+            name: item.name,
+            category: item.category,
+            emoji: item.emoji,
+        });
     }
 
     for (const stub of stubs) {

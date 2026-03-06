@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { getAllInventoryItems, upsertInventoryItem, toggleInventoryItem } from '@/features/api';
 import { Checkbox, Switch } from 'react-native-paper';
+import { seedT } from '@/i18n/seedKeys';
 
 type Item = { id: string; name: string; category: 'tool' | 'consumable'; unitDefault?: string | null; notes?: string | null; isOwned: boolean; };
 
@@ -72,7 +73,7 @@ export default function InventoryScreen() {
                 renderItem={({ item }) => (
                     <Surface style={[styles.itemCard, { backgroundColor: theme.colors.surfaceVariant }]} elevation={1}>
                         <List.Item
-                            title={item.name}
+                            title={seedT(t, item.id, 'name', item.name)}
                             description={item.notes ?? undefined}
                             left={props => (
                                 <List.Icon

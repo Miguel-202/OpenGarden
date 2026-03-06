@@ -103,7 +103,7 @@ export default function Dashboard() {
                                     ]} />
                                 </View>
                                 <Text variant="labelSmall" style={[styles.barLabel, { color: theme.colors.onSurfaceVariant }]}>
-                                    {day.dayLabel}
+                                    {t(`common.dayNames.${day.dayLabel}`)}
                                 </Text>
                             </View>
                         );
@@ -158,7 +158,7 @@ export default function Dashboard() {
                             <View key={i} style={styles.breakdownLabel}>
                                 <View style={[styles.legendDot, { backgroundColor: b.color }]} />
                                 <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                                    {b.type} ({totalBreakdown > 0 ? Math.round((b.count / totalBreakdown) * 100) : 0}%)
+                                    {t(`common.${b.type.toLowerCase()}`)} ({totalBreakdown > 0 ? Math.round((b.count / totalBreakdown) * 100) : 0}%)
                                 </Text>
                             </View>
                         ))}

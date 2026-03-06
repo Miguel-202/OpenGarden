@@ -2,7 +2,7 @@ import { db } from '@/db';
 import { templates, templateTools, templateConsumables, templateTasks } from '@/db/schema';
 import { count, eq } from 'drizzle-orm';
 
-export const BUILTIN_TEMPLATE_IDS = ['template_broccoli_sprouts', 'template_basil_windowsill', 'template_bonsai_training', 'template_green_onions_water', 'template_mint_cutting', 'template_lettuce_cut_again', 'template_radishes_container', 'template_microgreens_tray', 'template_pothos_lowlight', 'template_cherry_tomato'];
+export const BUILTIN_TEMPLATE_IDS = ['template_broccoli_sprouts', 'template_basil_windowsill', 'template_bonsai_training', 'template_green_onions_water', 'template_mint_cutting', 'template_lettuce_cut_again', 'template_radishes_container', 'template_microgreens_tray', 'template_pothos_lowlight', 'template_cherry_tomato', 'template_welcome_test'];
 
 const BUILTIN_TEMPLATES = [
     {
@@ -572,6 +572,41 @@ const BUILTIN_TEMPLATES = [
             },
         ],
     },
+    {
+        template: {
+            id: 'template_welcome_test',
+            title: 'Welcome Test 🌱',
+            difficulty: 'Beginner',
+            estimatedDailyTimeMins: 1,
+            totalDurationDays: 3,
+            environment: 'Anywhere',
+            emoji: '👋',
+        },
+        tools: [
+            { id: 'tool_welcome_phone', name: 'Your Phone', emoji: '📱' },
+        ],
+        consumables: [],
+        tasks: [
+            {
+                id: 'task_welcome_explore', title: 'Explore the Library', emoji: '📚',
+                description: 'Open the Library tab and browse the growing guides. Tap any guide to see its details.',
+                taskType: 'Preparation', windowStartDay: 0, windowEndDay: 0,
+                timeOfDay: '10:00', isRepeating: false,
+            },
+            {
+                id: 'task_welcome_check', title: 'Check Your Project', emoji: '✅',
+                description: 'Go to the Projects tab to see your Welcome project. Open the readiness check.',
+                taskType: 'Observation', windowStartDay: 1, windowEndDay: 1,
+                timeOfDay: '10:00', isRepeating: false,
+            },
+            {
+                id: 'task_welcome_complete', title: 'Complete & Celebrate!', emoji: '🎉',
+                description: 'Mark this task as done. Congratulations, you completed your first project loop!',
+                taskType: 'Harvest', windowStartDay: 2, windowEndDay: 2,
+                timeOfDay: '10:00', isRepeating: false,
+            },
+        ],
+    },
 ];
 
 export async function seedDatabase() {
@@ -626,7 +661,7 @@ async function applyBuiltinEmojis() {
             for (const task of data.tasks) {
                 await db.update(templateTasks).set({ emoji: task.emoji }).where(eq(templateTasks.id, task.id));
             }
-        } catch {}
+        } catch { }
     }
 }
 
